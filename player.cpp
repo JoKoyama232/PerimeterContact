@@ -20,7 +20,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	MODEL_PLAYER		"data/MODEL/cube.obj"			// 読み込むモデル名
+#define	MODEL_PLAYER		"data/MODEL/enemy.obj"			// 読み込むモデル名
 #define	MODEL_PLAYER_HAND	"data/MODEL/hand.obj"			// 読み込むモデル名
 #define	MODEL_PLAYER_HEAD	"data/MODEL/head.obj"			// 読み込むモデル名
 #define	MODEL_PLAYER_PARTS	"data/MODEL/funnel_s.obj"			// 読み込むモデル名
