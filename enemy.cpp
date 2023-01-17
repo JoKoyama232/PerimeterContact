@@ -11,7 +11,8 @@
 #include "model.h"
 #include "enemy.h"
 #include "shadow.h"
-
+#include "meshfield.h"
+#include "collision.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -67,7 +68,7 @@ HRESULT InitEnemy(void)
 		g_Enemy[i].tbl_size = 0;		// 再生するアニメデータのレコード数をセット
 
 		g_Enemy[i].use = true;			// true:生きてる
-		g_Enemy[i].parent = NULL;
+		g_Enemy[i].attachedTo = NULL;
 
 		//tracks
 		for (int j = 0; j < ENEMY_PARTS_MAX; j++)
@@ -104,7 +105,7 @@ HRESULT InitEnemy(void)
 			g_Parts[j].tbl_adr = NULL;		// 再生するアニメデータの先頭アドレスをセット
 			g_Parts[j].tbl_size = 0;		// 再生するアニメデータのレコード数をセット
 			g_Parts[j].use = true;			// true:生きてる
-			g_Parts[j].parent = &g_Enemy[i];
+			g_Parts[j].attachedTo = &g_Enemy[i];
 
 
 		}
@@ -147,7 +148,7 @@ void UpdateEnemy(void)
 	// エネミーを動かく場合は、影も合わせて動かす事を忘れないようにね！
 	for (int i = 0; i < MAX_ENEMY; i++)
 	{
-		if (g_Enemy[i].use == true)	continue;		// このエネミーが使われている？
+		if (g_Enemy[i].use != true)	continue;		// このエネミーが使われている？
 											// Yes
 		if (g_Enemy[i].tbl_adr != NULL)	// 線形補間を実行する？
 		{								// 線形補間の処理
@@ -194,6 +195,11 @@ void UpdateEnemy(void)
 		pos.y -= (ENEMY_OFFSET_Y - 0.1f);
 		SetPositionShadow(g_Enemy[i].shadowIdx, pos);
 		
+	}
+
+	for (int i = 0; i < ENEMY_PARTS_MAX * MAX_ENEMY; i++)
+	{
+		XMFLOAT3 trackpos = AffineTransform(g_Parts[i].points.VertexArray[15], XMLoadFloat4x4(&g_Parts[i].mtxWorld));
 	}
 
 }
@@ -255,9 +261,9 @@ void DrawEnemy(void)
 			mtxTranslate = XMMatrixTranslation(g_Parts[j].pos.x, g_Parts[j].pos.y, g_Parts[j].pos.z);
 			mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
 
-			if (g_Parts[j].parent != NULL)
+			if (g_Parts[j].attachedTo != NULL)
 			{
-				mtxWorld = XMMatrixMultiply(mtxWorld, XMLoadFloat4x4(&g_Parts[i].parent->mtxWorld));
+				mtxWorld = XMMatrixMultiply(mtxWorld, XMLoadFloat4x4(&g_Parts[i].attachedTo->mtxWorld));
 			}
 
 			// ワールドマトリックスの設定
@@ -281,6 +287,6 @@ ENEMY *GetEnemy()
 	return &g_Enemy[0];
 }
 
-ENEMY *GetParts(){
+ENEMY *GetEnemyParts(){
 	return &g_Parts[0];
 }

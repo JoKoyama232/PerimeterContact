@@ -148,6 +148,7 @@
     <ClInclude Include="debugproc.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="knife.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="lightCamera.h" />
     <ClInclude Include="main.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="debugproc.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="input.cpp" />
+    <ClCompile Include="knife.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="lightCamera.cpp" />
     <ClCompile Include="main.cpp" />

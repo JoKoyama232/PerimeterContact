@@ -115,7 +115,7 @@ HRESULT InitPlayer(void)
 
 
 	// 階層アニメーション用の初期化処理
-	g_Player.parent = NULL;			// 本体（親）なのでNULLを入れる
+	g_Player.attachedTo = NULL;			// 本体（親）なのでNULLを入れる
 
 	// パーツの初期化
 	for (int i = 0; i < PLAYER_PARTS_MAX; i++)
@@ -129,9 +129,9 @@ HRESULT InitPlayer(void)
 		g_Parts[i].scl = XMFLOAT3(0.5f, 0.5f, 0.5f);
 
 		// 親子関係
-		g_Parts[i].parent = &g_Player;		// ← ここに親のアドレスを入れる
-	//	g_Parts[腕].parent= &g_Player;		// 腕だったら親は本体（プレイヤー）
-	//	g_Parts[手].parent= &g_Paerts[腕];	// 指が腕の子供だった場合の例
+		g_Parts[i].attachedTo = &g_Player;		// ← ここに親のアドレスを入れる
+	//	g_Parts[腕].attachedTo= &g_Player;		// 腕だったら親は本体（プレイヤー）
+	//	g_Parts[手].attachedTo= &g_Paerts[腕];	// 指が腕の子供だった場合の例
 
 		// 階層アニメーション用のメンバー変数の初期化
 		g_Parts[i].time = 0.0f;			// 線形補間用のタイマーをクリア
@@ -495,9 +495,9 @@ void DrawPlayer(void)
 		mtxTranslate = XMMatrixTranslation(g_Parts[i].pos.x, g_Parts[i].pos.y, g_Parts[i].pos.z);
 		mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
 
-		if (g_Parts[i].parent != NULL)	// 子供だったら親と結合する
+		if (g_Parts[i].attachedTo != NULL)	// 子供だったら親と結合する
 		{
-			mtxWorld = XMMatrixMultiply(mtxWorld, XMLoadFloat4x4(&g_Parts[i].parent->mtxWorld));
+			mtxWorld = XMMatrixMultiply(mtxWorld, XMLoadFloat4x4(&g_Parts[i].attachedTo->mtxWorld));
 			// ↑
 			// g_Player.mtxWorldを指している
 		}

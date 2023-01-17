@@ -39,13 +39,13 @@ struct ENEMY
 	int					tbl_size;			// 登録したテーブルのレコード総数
 	float				move_time;			// 実行時間
 
-	ENEMY* parent;	// 自分が親ならNULL、自分が子供なら親のplayerアドレス
+	ENEMY* attachedTo;	// 自分が親ならNULL、自分が子供なら親のplayerアドレス
 
 };
 
 struct ENEMYHitBox {
-	HitBox* hitbox;
-	ENEMY* parent;
+	HITBOX* hitbox;
+	ENEMY* attachedTo;
 };
 
 //*****************************************************************************
@@ -57,4 +57,4 @@ void UpdateEnemy(void);
 void DrawEnemy(void);
 
 ENEMY *GetEnemy(void);
-
+ENEMY* GetEnemyParts();

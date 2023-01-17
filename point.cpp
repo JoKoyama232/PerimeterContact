@@ -13,6 +13,8 @@
 #include "enemy.h"
 #include "point.h"
 #include "collision.h"
+#include "input.h"
+#include "debugproc.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -46,7 +48,7 @@ static ID3D11Buffer* g_VertexBuffer = NULL;		// 頂点バッファ
 
 static ID3D11ShaderResourceView* g_Texture[1] = { NULL };	// テクスチャ情報
 static int							g_TexNo;					// テクスチャ番号
-
+static int							g_pointidx;
 static VERTEXINFO					g_PlayerModelVerticies[MAX_POINTS];		// パーティクルワーク
 static VERTEXINFO					g_EnemyModelVerticies[MAX_POINTS];		// パーティクルワーク
 
@@ -78,7 +80,7 @@ HRESULT InitPoint(void)
 	}
 
 	g_TexNo = 0;
-
+	g_pointidx = 0;
 	PLAYER* player = GetPlayer();
 	// パーティクルワークの初期化
 	for (short playerModelVertexCount = 0; playerModelVertexCount < player->points.VertexNum ; playerModelVertexCount++)
@@ -92,7 +94,7 @@ HRESULT InitPoint(void)
 		g_PlayerModelVerticies[playerModelVertexCount].bUse = true;
 	}
 
-	ENEMY* enemy = GetEnemy();
+	ENEMY* enemy = GetEnemyParts();
 	// パーティクルワークの初期化
 	for (short enemyModelVertexCount = 0; enemyModelVertexCount < enemy[0].points.VertexNum; enemyModelVertexCount++)
 	{
@@ -148,11 +150,19 @@ void UpdatePoint(void)
 		g_PlayerModelVerticies[playerModelVertexCount].pos = AffineTransform(player->points.VertexArray[playerModelVertexCount] ,XMLoadFloat4x4(&player->mtxWorld));
 	}
 
-	ENEMY* enemy = GetEnemy();
+	ENEMY* enemy = GetEnemyParts();
 	// パーティクルワークの初期化
 	for (short enemyModelVertexCount = 0; enemyModelVertexCount < enemy[0].points.VertexNum; enemyModelVertexCount++)
 	{
 		g_EnemyModelVerticies[enemyModelVertexCount].pos = AffineTransform(enemy[0].points.VertexArray[enemyModelVertexCount], XMLoadFloat4x4(&enemy[0].mtxWorld));
+	}
+
+	if (GetKeyboardPress(DIK_LSHIFT))
+	{
+		g_pointidx++;
+		if (g_pointidx > enemy[0].points.VertexNum) {
+			g_pointidx -= enemy[0].points.VertexNum;
+		}
 	}
 	
 }
@@ -234,21 +244,17 @@ void DrawPoint(void)
 		GetDeviceContext()->Draw(4, 0);
 		
 	}
-	ENEMY* enemy = GetEnemy();
+
+	ENEMY* enemy = GetEnemyParts();
 	for (int enemyModelVertexCount = 0; enemyModelVertexCount < enemy[0].points.VertexNum; enemyModelVertexCount++)
 	{
-		if (!g_EnemyModelVerticies[enemyModelVertexCount].bUse) continue;
+		if (!g_EnemyModelVerticies[enemyModelVertexCount].bUse ||enemyModelVertexCount != g_pointidx) continue;
 
 		// ワールドマトリックスの初期化
 		mtxWorld = XMMatrixIdentity();
 
 		//ビューマトリックスを取得
 		mtxView = XMLoadFloat4x4(&cam->mtxView);
-
-		////mtxWorld = XMMatrixInverse(nullptr, mtxView);
-		////mtxWorld.r[3].m128_f32[0] = 0.0f;
-		////mtxWorld.r[3].m128_f32[1] = 0.0f;
-		////mtxWorld.r[3].m128_f32[2] = 0.0f;
 
 		// 処理が速いしお勧め
 		mtxWorld.r[0].m128_f32[0] = mtxView.r[0].m128_f32[0];
@@ -293,7 +299,7 @@ void DrawPoint(void)
 
 	// フォグ有効
 	SetFogEnable(GetFogEnable());
-
+	PrintDebugProc("Part:%d\n",g_pointidx);
 }
 
 //=============================================================================

@@ -505,3 +505,25 @@ void AppliedTransform(XMFLOAT3* target,short amount, XMFLOAT3 posArray[], XMMATR
 	}
 }
 
+void UpdateHitbox(XMFLOAT3* hitboxList, short listSize, XMFLOAT3 vertexPositionList[], XMFLOAT3 position, XMFLOAT3 rotation, XMFLOAT3 scale) {
+	// 当たり判定用の変数を更新
+	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
+
+	// ワールドマトリックスの初期化
+	mtxWorld = XMMatrixIdentity();
+
+	// スケールを反映
+	mtxScl = XMMatrixScaling(scale.x, scale.y, scale.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
+
+	// 回転を反映
+	mtxRot = XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
+
+	// 移動を反映
+	mtxTranslate = XMMatrixTranslation(position.x, position.y, position.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
+
+	AppliedTransform(hitboxList, listSize, vertexPositionList, mtxWorld);
+}
+

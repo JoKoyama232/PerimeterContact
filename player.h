@@ -41,7 +41,7 @@ struct PLAYER
 	int					tblMax;				// そのテーブルのデータ数
 
 	// 親は、NULL、子供は親のアドレスを入れる(セーブ＆ロードの時は↓ここ気をつける事)
-	PLAYER				*parent;	// 自分が親ならNULL、自分が子供なら親のplayerアドレス
+	PLAYER				*attachedTo;	// 自分が親ならNULL、自分が子供なら親のplayerアドレス
 
 
 };

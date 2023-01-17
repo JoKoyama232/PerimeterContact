@@ -69,7 +69,7 @@ struct INTERPOLATION_DATA
 	float		frame;		// ÀsƒtƒŒ[ƒ€” ( dt = 1.0f/frame )
 };
 
-struct HitBox
+struct HITBOX
 {
 	XMFLOAT3	*list;
 };
