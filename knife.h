@@ -36,9 +36,10 @@ struct KNIFE
 	XMFLOAT3	scl;								// モデルの大きさ(スケール)
 
 	// ゲームロジック変数群
-	ENEMY* attachedTo;								// 当たったエネミー
+	ENEMY*		attachedTo;								// 当たったエネミー
 	XMFLOAT3	velocity;							// ナイフの速度
 	XMFLOAT3	acceleration;						// ナイフの加速度
+	DWORD		latestUpdate;
 	KNIFESTATE	state;								// ナイフ現在の状態
 	
 
@@ -53,4 +54,4 @@ void UpdateKnife(void);
 void DrawKnife(void);
 
 KNIFE* GetKnife(void);
-
+void FireKnife(XMFLOAT3 firePosition, XMFLOAT3 fireDirection);

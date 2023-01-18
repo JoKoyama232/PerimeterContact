@@ -94,7 +94,7 @@ HRESULT InitPoint(void)
 		g_PlayerModelVerticies[playerModelVertexCount].bUse = true;
 	}
 
-	ENEMY* enemy = GetEnemyParts();
+	ENEMY* enemy = GetEnemy();
 	// パーティクルワークの初期化
 	for (short enemyModelVertexCount = 0; enemyModelVertexCount < enemy[0].points.VertexNum; enemyModelVertexCount++)
 	{
@@ -150,7 +150,7 @@ void UpdatePoint(void)
 		g_PlayerModelVerticies[playerModelVertexCount].pos = AffineTransform(player->points.VertexArray[playerModelVertexCount] ,XMLoadFloat4x4(&player->mtxWorld));
 	}
 
-	ENEMY* enemy = GetEnemyParts();
+	ENEMY* enemy = GetEnemy();
 	// パーティクルワークの初期化
 	for (short enemyModelVertexCount = 0; enemyModelVertexCount < enemy[0].points.VertexNum; enemyModelVertexCount++)
 	{
@@ -245,10 +245,10 @@ void DrawPoint(void)
 		
 	}
 
-	ENEMY* enemy = GetEnemyParts();
+	ENEMY* enemy = GetEnemy();
 	for (int enemyModelVertexCount = 0; enemyModelVertexCount < enemy[0].points.VertexNum; enemyModelVertexCount++)
 	{
-		if (!g_EnemyModelVerticies[enemyModelVertexCount].bUse ||enemyModelVertexCount != g_pointidx) continue;
+		if (!g_EnemyModelVerticies[enemyModelVertexCount].bUse) continue;
 
 		// ワールドマトリックスの初期化
 		mtxWorld = XMMatrixIdentity();

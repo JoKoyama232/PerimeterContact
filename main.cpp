@@ -26,6 +26,7 @@
 #include "tutorial.h"
 #include "particle.h"
 #include "point.h"
+#include "knife.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -154,7 +155,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 				dwFrameCount = 0;							// カウントをクリア
 			}
 
-			if ((dwCurrentTime - dwExecLastTime) >= (1000 / 60))	// 1/60秒ごとに実行
+			if ((dwCurrentTime - dwExecLastTime) >= (1000/60))	// 1/60秒ごとに実行
 			{
 				dwExecLastTime = dwCurrentTime;	// 処理した時刻を保存
 
@@ -298,8 +299,6 @@ void Update(void)
 		// エネミーの更新処理
 		UpdateEnemy();
 
-		
-
 		// 木の更新処理
 		UpdateTree();
 
@@ -307,6 +306,8 @@ void Update(void)
 		UpdateBullet();
 
 		UpdateParticle();
+
+		UpdateKnife();
 
 		// 影の更新処理
 		UpdateShadow();
@@ -368,7 +369,7 @@ void Draw(void)
 
 		// 壁の描画処理
 		DrawMeshWall();
-
+		DrawKnife();
 		// 木の描画処理
 		//DrawTree();
 
@@ -384,7 +385,7 @@ void Draw(void)
 		break;
 
 	}
-	SetViewPort(TYPE_RIGHT_HALF_SCREEN);
+	//SetViewPort(TYPE_RIGHT_HALF_SCREEN);
 
 
 
@@ -428,7 +429,7 @@ void CheckHit(void)
 {
 	ENEMY  *enemy  = GetEnemy();	// エネミーのポインターを初期化
 	PLAYER *player = GetPlayer();	// プレイヤーのポインターを初期化
-	BULLET *bullet = GetBullet();	// 弾のポインターを初期化
+	KNIFE  *knife  = GetKnife();	// ナイフのポインターを初期化
 	
 	XMFLOAT3 *playerVerts = new XMFLOAT3[player->points.VertexNum];
 	if (!playerVerts == NULL) {
@@ -474,10 +475,10 @@ void CheckHit(void)
 
 
 	// プレイヤーの弾と敵
-	for (int i = 0; i < MAX_BULLET; i++)
+	for (int i = 0; i < MAX_KNIFE; i++)
 	{
-		//弾の有効フラグをチェックする
-		if (bullet[i].use == false)
+		//ナイフの有効フラグをチェックする
+		if (knife[i].state == unused)
 			continue;
 
 		// 敵と当たってるか調べる
@@ -486,21 +487,23 @@ void CheckHit(void)
 			//敵の有効フラグをチェックする
 			if (enemy[j].use == false)
 				continue;
+			XMFLOAT3* enemyVerts = new XMFLOAT3[enemy[j].points.VertexNum];
+			if (!enemyVerts == NULL) {
+				for (int p = 0; p < enemy[j].points.VertexNum; p++) {
+					enemyVerts[p] = AffineTransform(enemy[j].points.VertexArray[p], XMLoadFloat4x4(&enemy[j].mtxWorld));
+				}
+				//GJKの当たり判定
+				if (GJKHit(knife[i].hitbox.list, knife[i].modelVertexPosition.VertexNum, enemyVerts, enemy[j].points.VertexNum))
+				{
+					// 当たったから未使用に戻す
+					knife[i].state = hit;
+					knife[i].attachedTo = &enemy[j];
 
-			//BCの当たり判定
-			if (CollisionBC(bullet[i].pos, enemy[j].pos, bullet[i].fWidth, enemy[j].size))
-			{
-				// 当たったから未使用に戻す
-				bullet[i].use = false;
-				ReleaseShadow(bullet[i].shadowIdx);
-
-				// 敵キャラクターは倒される
-				enemy[j].use = false;
-				ReleaseShadow(enemy[j].shadowIdx);
-
-				// スコアを足す
-				AddScore(10);
+					// スコアを足す
+					AddScore(10);
+				}
 			}
+			delete[] enemyVerts;
 		}
 
 	}
@@ -559,7 +562,7 @@ void SetMode(int mode) {
 	UninitMeshField();
 
 	UninitParticle();
-
+	UninitKnife();
 	//リザルト処理の終了処理
 	UninitResult();
 
@@ -578,25 +581,25 @@ void SetMode(int mode) {
 		// フィールドの初期化
 		InitMeshField(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 20, 20, 100.0f, 100.0f);
 
-		// 壁の初期化
-		InitMeshWall(XMFLOAT3(0.0f, 0.0f, MAP_TOP), XMFLOAT3(0.0f, 0.0f, 0.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
-		InitMeshWall(XMFLOAT3(MAP_LEFT, 0.0f, 0.0f), XMFLOAT3(0.0f, -XM_PI * 0.50f, 0.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
-		InitMeshWall(XMFLOAT3(MAP_RIGHT, 0.0f, 0.0f), XMFLOAT3(0.0f, XM_PI * 0.50f, 0.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
-		InitMeshWall(XMFLOAT3(0.0f, 0.0f, MAP_DOWN), XMFLOAT3(0.0f, XM_PI, 0.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
+		//// 壁の初期化
+		//InitMeshWall(XMFLOAT3(0.0f, 0.0f, MAP_TOP), XMFLOAT3(0.0f, 0.0f, 0.0f),
+		//	XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
+		//InitMeshWall(XMFLOAT3(MAP_LEFT, 0.0f, 0.0f), XMFLOAT3(0.0f, -XM_PI * 0.50f, 0.0f),
+		//	XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
+		//InitMeshWall(XMFLOAT3(MAP_RIGHT, 0.0f, 0.0f), XMFLOAT3(0.0f, XM_PI * 0.50f, 0.0f),
+		//	XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
+		//InitMeshWall(XMFLOAT3(0.0f, 0.0f, MAP_DOWN), XMFLOAT3(0.0f, XM_PI, 0.0f),
+		//	XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
 
-		// 壁(裏側用の半透明)
-		InitMeshWall(XMFLOAT3(0.0f, 0.0f, MAP_TOP), XMFLOAT3(0.0f, XM_PI, 0.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
-		InitMeshWall(XMFLOAT3(MAP_LEFT, 0.0f, 0.0f), XMFLOAT3(0.0f, XM_PI * 0.50f, 0.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
-		InitMeshWall(XMFLOAT3(MAP_RIGHT, 0.0f, 0.0f), XMFLOAT3(0.0f, -XM_PI * 0.50f, 0.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
-		InitMeshWall(XMFLOAT3(0.0f, 0.0f, MAP_DOWN), XMFLOAT3(0.0f, 0.0f, 0.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
+		//// 壁(裏側用の半透明)
+		//InitMeshWall(XMFLOAT3(0.0f, 0.0f, MAP_TOP), XMFLOAT3(0.0f, XM_PI, 0.0f),
+		//	XMFLOAT4(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
+		//InitMeshWall(XMFLOAT3(MAP_LEFT, 0.0f, 0.0f), XMFLOAT3(0.0f, XM_PI * 0.50f, 0.0f),
+		//	XMFLOAT4(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
+		//InitMeshWall(XMFLOAT3(MAP_RIGHT, 0.0f, 0.0f), XMFLOAT3(0.0f, -XM_PI * 0.50f, 0.0f),
+		//	XMFLOAT4(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
+		//InitMeshWall(XMFLOAT3(0.0f, 0.0f, MAP_DOWN), XMFLOAT3(0.0f, 0.0f, 0.0f),
+		//	XMFLOAT4(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
 
 		// 影の初期化処理
 		InitShadow();
@@ -606,6 +609,8 @@ void SetMode(int mode) {
 
 		// エネミーの初期化
 		InitEnemy();
+
+		InitKnife();
 
 		InitPoint();
 		// 木を生やす

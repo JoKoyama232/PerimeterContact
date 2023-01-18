@@ -15,12 +15,12 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	MODEL_KNIFE			"data/MODEL/knife.obj"		// モデル名
+#define	MODEL_KNIFE			"data/MODEL/sword.obj"		// モデル名
 #define	MODEL_KNIFE_PARTS	"data/MODEL/tracks.obj"		
 
-#define	ROTATE_VALUE		(XM_PI * 0.02f)				// 回転量
-#define	THROW_DIRECTION_POW	(4)				// 回転量
-#define	THROW_HEIGHT_POW	(3.0f)				// 回転量
+#define	ROTATE_VALUE		(XM_PI * 0.1f)				// 回転量
+#define	THROW_DIRECTION_POW	(250)				// 回転量
+#define	THROW_HEIGHT_POW	(100.0f)				// 回転量
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -48,12 +48,12 @@ HRESULT InitKnife(void)
 		// ゲーム内位置
 		g_Knife[i].pos = XMFLOAT3(0.0f, -20.0f, 0.0f);
 		g_Knife[i].rot = XMFLOAT3(0.0f, 0.0f, 0.0f);
-		g_Knife[i].scl = XMFLOAT3(1.0f, 1.0f, 1.0f);
+		g_Knife[i].scl = XMFLOAT3(0.5f, 0.5f, 0.5f);
 		
 		// ゲーム用ロジック
 		g_Knife[i].attachedTo = NULL;
 		g_Knife[i].velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-		g_Knife[i].acceleration = XMFLOAT3(0.0f, -0.5f, 0.0f);
+		g_Knife[i].acceleration = XMFLOAT3(0.0f, -10.0f, 0.0f);
 		g_Knife[i].state = unused;
 		
 	}
@@ -86,29 +86,37 @@ void UpdateKnife(void)
 	// ナイフを動かく場合は、影も合わせて動かす事を忘れないようにね！
 	for (int i = 0; i < MAX_KNIFE; i++)
 	{
-		if (g_Knife[i].state == hit)
+		if (g_Knife[i].state == hit){
 			UpdateHitbox(g_Knife[i].hitbox.list, g_Knife[i].modelVertexPosition.VertexNum,
 				g_Knife[i].modelVertexPosition.VertexArray, g_Knife[i].pos, g_Knife[i].rot, g_Knife[i].scl);
+			continue;
+		}
+			
 		
 		// 飛ばされているなら物理計算
 		if (g_Knife[i].state != fired)	continue;
-		
+		if (g_Knife[i].pos.y < -50.0f) g_Knife[i].state = unused;
+
+		DWORD currentTimems = timeGetTime();
+		DWORD elapsedTimems = currentTimems - g_Knife[i].latestUpdate;
+		g_Knife[i].latestUpdate = currentTimems;
+
 		// 移動処理
 		XMVECTOR position = XMLoadFloat3(&g_Knife[i].pos);
 		XMVECTOR velocity = XMLoadFloat3(&g_Knife[i].velocity);
 		XMVECTOR acceleration = XMLoadFloat3(&g_Knife[i].acceleration);
 
-		position += velocity;
-		velocity += acceleration;
+		position += velocity * (float)(elapsedTimems * 0.001f);
+		velocity += acceleration * (float)(elapsedTimems * 0.001f);
 
 		XMStoreFloat3(&g_Knife[i].pos,position);
 		XMStoreFloat3(&g_Knife[i].velocity, velocity);
 
 		// 回転処理
-		g_Knife[i].rot.x += ROTATE_VALUE;
+		g_Knife[i].rot.x -= ROTATE_VALUE;
 
 		// ヒットボックス
-		UpdateHitbox(g_Knife[i].hitbox.list, g_Knife[i].modelVertexPosition.VertexNum, 
+		UpdateHitbox(g_Knife[i].hitbox.list, g_Knife[i].modelVertexPosition.VertexNum,
 			g_Knife[i].modelVertexPosition.VertexArray, g_Knife[i].pos, g_Knife[i].rot, g_Knife[i].scl);
 	}
 
@@ -168,13 +176,13 @@ KNIFE *GetKnife()
 //=============================================================================
 // ナイフを飛ばす
 //=============================================================================
-void fireKnife(XMFLOAT3 firePosition,XMFLOAT3 fireDirection) {
+void FireKnife(XMFLOAT3 firePosition,XMFLOAT3 fireDirection) {
 	for (int i = 0; i < MAX_KNIFE; i++)
 	{
 		if (!g_Knife[i].load || g_Knife[i].state != unused) continue;
 
 		g_Knife[i].hitbox.list = new XMFLOAT3[g_Knife[i].modelVertexPosition.VertexNum];
-
+		g_Knife[i].latestUpdate = timeGetTime();
 		g_Knife[i].pos = firePosition;
 		g_Knife[i].rot.y = fireDirection.y;
 		g_Knife[i].velocity.x = -sinf(fireDirection.y)* THROW_DIRECTION_POW;

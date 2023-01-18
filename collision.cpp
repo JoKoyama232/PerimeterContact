@@ -501,9 +501,10 @@ XMFLOAT3 AffineTransform(XMFLOAT3 pos, XMMATRIX mtxWorld) {
 
 void AppliedTransform(XMFLOAT3* target,short amount, XMFLOAT3 posArray[], XMMATRIX mtxWorld) {
 	for (int i = 0; i < amount; i++) {
-		target = &AffineTransform(posArray[i], mtxWorld);
+		target[i] = AffineTransform(posArray[i], mtxWorld);
 	}
 }
+
 
 void UpdateHitbox(XMFLOAT3* hitboxList, short listSize, XMFLOAT3 vertexPositionList[], XMFLOAT3 position, XMFLOAT3 rotation, XMFLOAT3 scale) {
 	// “–‚½‚è”»’è—p‚Ì•Ï”‚ðXV

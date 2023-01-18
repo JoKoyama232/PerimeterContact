@@ -16,6 +16,8 @@
 #include "particle.h"
 #include "meshfield.h"
 #include "collision.h"
+#include "enemy.h"
+#include "knife.h"
 
 //*****************************************************************************
 // É}ÉNÉçíËã`
@@ -342,7 +344,8 @@ void UpdatePlayer(void)
 	// íeî≠éÀèàóù
 	if (IsMouseLeftTriggered())
 	{
-		SetBullet(g_Player.pos, XMFLOAT3(0,100,0), XMFLOAT3(0, 0, 400));
+		//SetBullet(g_Player.pos, XMFLOAT3(0,100,0), XMFLOAT3(0, 0, 400));
+		FireKnife(g_Player.pos, g_Player.rot);
 	}
 
 	g_Player.spd *= 0.5f;
