@@ -13,6 +13,7 @@
 #include "shadow.h"
 #include "meshfield.h"
 #include "collision.h"
+#include "debugproc.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -79,22 +80,22 @@ HRESULT InitEnemy(void)
 			switch (j) {
 			case 0:
 				//Front Right
-				g_Parts[j].pos = XMFLOAT3(30.0f, -ENEMY_OFFSET_Y * 2, -5.0f);
+				g_Parts[j].pos = XMFLOAT3(30.0f, 0.0f, -5.0f);
 				g_Parts[j].rot = XMFLOAT3(XM_PI / 5, 0.0f, 0.0f);
 				break;
 			case 1:
 				//Front Left
-				g_Parts[j].pos = XMFLOAT3(-30.0f, -ENEMY_OFFSET_Y * 2, -5.0f);
+				g_Parts[j].pos = XMFLOAT3(-30.0f, 0.0f, -5.0f);
 				g_Parts[j].rot = XMFLOAT3(XM_PI / 5, 0.0f, 0.0f);
 				break;
 			case 2:
 				//Back Right
-				g_Parts[j].pos = XMFLOAT3(30.0f, -ENEMY_OFFSET_Y * 2, 0.0f);
+				g_Parts[j].pos = XMFLOAT3(30.0f, 0.0f, 0.0f);
 				g_Parts[j].rot = XMFLOAT3(XM_PI / 5, XM_PI, 0.0f);
 				break;
 			case 3:
 				//Back Left
-				g_Parts[j].pos = XMFLOAT3(-30.0f, -ENEMY_OFFSET_Y * 2, 0.0f);
+				g_Parts[j].pos = XMFLOAT3(-30.0f, 0.0f, 0.0f);
 				g_Parts[j].rot = XMFLOAT3(XM_PI / 5, XM_PI, 0.0f);
 				break;
 			}
@@ -149,54 +150,17 @@ void UpdateEnemy(void)
 	for (int i = 0; i < MAX_ENEMY; i++)
 	{
 		if (g_Enemy[i].use != true)	continue;		// このエネミーが使われている？
-											// Yes
-		if (g_Enemy[i].tbl_adr != NULL)	// 線形補間を実行する？
-		{								// 線形補間の処理
-			// 移動処理
-			int		index = (int)g_Enemy[i].move_time;
-			float	time = g_Enemy[i].move_time - index;
-			int		size = g_Enemy[i].tbl_size;
-
-			float dt = 1.0f / g_Enemy[i].tbl_adr[index].frame;	// 1フレームで進める時間
-			g_Enemy[i].move_time += dt;							// アニメーションの合計時間に足す
-
-			if (index > (size - 2))	// ゴールをオーバーしていたら、最初へ戻す
-			{
-				g_Enemy[i].move_time = 0.0f;
-				index = 0;
-			}
-			for (int j = 0; j < ENEMY_PARTS_MAX; j++) {
-				if (!g_Parts[j].use) continue;
-
-			}
-
-			//// 座標を求める	X = StartX + (EndX - StartX) * 今の時間
-			//XMVECTOR p1 = XMLoadFloat3(&g_Enemy[i].tbl_adr[index + 1].pos);	// 次の場所
-			//XMVECTOR p0 = XMLoadFloat3(&g_Enemy[i].tbl_adr[index + 0].pos);	// 現在の場所
-			//XMVECTOR vec = p1 - p0;
-			//XMStoreFloat3(&g_Enemy[i].pos, p0 + vec * time);
-
-			//// 回転を求める	R = StartX + (EndX - StartX) * 今の時間
-			//XMVECTOR r1 = XMLoadFloat3(&g_Enemy[i].tbl_adr[index + 1].rot);	// 次の角度
-			//XMVECTOR r0 = XMLoadFloat3(&g_Enemy[i].tbl_adr[index + 0].rot);	// 現在の角度
-			//XMVECTOR rot = r1 - r0;
-			//XMStoreFloat3(&g_Enemy[i].rot, r0 + rot * time);
-
-			//// scaleを求める S = StartX + (EndX - StartX) * 今の時間
-			//XMVECTOR s1 = XMLoadFloat3(&g_Enemy[i].tbl_adr[index + 1].scl);	// 次のScale
-			//XMVECTOR s0 = XMLoadFloat3(&g_Enemy[i].tbl_adr[index + 0].scl);	// 現在のScale
-			//XMVECTOR scl = s1 - s0;
-			//XMStoreFloat3(&g_Enemy[i].scl, s0 + scl * time);
-
-		}
-
+													// Yes
+		
+		g_Enemy[i].rot.y += XM_PI * 0.01f;
 		// 影もプレイヤーの位置に合わせる
 		XMFLOAT3 pos = g_Enemy[i].pos;
 		pos.y -= (ENEMY_OFFSET_Y - 0.1f);
 		SetPositionShadow(g_Enemy[i].shadowIdx, pos);
+		PrintDebugProc("enemy:X:%f Y:%f Z:%f\n", g_Enemy[i].rot.x, g_Enemy[i].rot.y, g_Enemy[i].rot.z);
 		
 	}
-
+	
 	for (int i = 0; i < ENEMY_PARTS_MAX * MAX_ENEMY; i++)
 	{
 		XMFLOAT3 trackpos = AffineTransform(g_Parts[i].points.VertexArray[15], XMLoadFloat4x4(&g_Parts[i].mtxWorld));
@@ -247,7 +211,7 @@ void DrawEnemy(void)
 			if (g_Parts[j].use == false) continue;
 
 			// ワールドマトリックスの初期化
-			mtxWorld = XMLoadFloat4x4(&g_Enemy[i].mtxWorld);
+			mtxWorld = XMMatrixIdentity();
 
 			// スケールを反映
 			mtxScl = XMMatrixScaling(g_Parts[j].scl.x, g_Parts[j].scl.y, g_Parts[j].scl.z);

@@ -27,11 +27,11 @@
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static ID3D11Buffer				*g_VertexBuffer = NULL;		// 頂点情報
-static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
+static ID3D11Buffer* g_VertexBuffer = NULL;		// 頂点情報
+static ID3D11ShaderResourceView* g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
-static char *g_TexturName[TEXTURE_MAX] = {
-	"data/TEXTURE/bg001.jpg",
+static char* g_TexturName[TEXTURE_MAX] = {
+	"data/TEXTURE/end.png",
 	"data/TEXTURE/result_logo.png",
 	"data/TEXTURE/number16x32.png",
 };
@@ -49,7 +49,7 @@ static BOOL						g_Load = FALSE;
 //=============================================================================
 HRESULT InitResult(void)
 {
-	ID3D11Device *pDevice = GetDevice();
+	ID3D11Device* pDevice = GetDevice();
 
 	//テクスチャ生成
 	for (int i = 0; i < TEXTURE_MAX; i++)
@@ -75,10 +75,10 @@ HRESULT InitResult(void)
 
 
 	// 変数の初期化
-	g_Use   = TRUE;
-	g_w     = TEXTURE_WIDTH;
-	g_h     = TEXTURE_HEIGHT;
-	g_Pos   = { g_w / 2, 50.0f, 0.0f };
+	g_Use = TRUE;
+	g_w = TEXTURE_WIDTH;
+	g_h = TEXTURE_HEIGHT;
+	g_Pos = { g_w / 2, 50.0f, 0.0f };
 	g_TexNo = 0;
 
 	// BGM再生
@@ -135,7 +135,7 @@ void UpdateResult(void)
 
 
 #ifdef _DEBUG	// デバッグ情報を表示する
-	
+
 #endif
 
 }
@@ -206,9 +206,9 @@ void DrawResult(void)
 			float x = (float)(number % 10);
 
 			// スコアの位置やテクスチャー座標を反映
-			float pw = 16*4;			// スコアの表示幅
-			float ph = 32*4;			// スコアの表示高さ
-			float px = 600.0f - i*pw;	// スコアの表示位置X
+			float pw = 16 * 4;			// スコアの表示幅
+			float ph = 32 * 4;			// スコアの表示高さ
+			float px = 600.0f - i * pw;	// スコアの表示位置X
 			float py = 300.0f;			// スコアの表示位置Y
 
 			float tw = 1.0f / 10;		// テクスチャの幅

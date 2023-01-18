@@ -48,8 +48,8 @@
 static PLAYER		g_Player;						// プレイヤー
 static float		camRotY =0.0f;
 static PLAYER		g_Parts[PLAYER_PARTS_MAX];		// プレイヤーのパーツ用
-static XMFLOAT3 dashTbl[2];
-static int particleWait = 0;
+static XMFLOAT3		dashTbl[2];
+static int			particleWait = 0;
 
 static DWORD dashcd;
 static DWORD attackcd;
@@ -535,14 +535,16 @@ PLAYER *GetPlayer(void)
 }
 
 XMFLOAT3 GetLerp(XMFLOAT3 initialPos, XMFLOAT3 endingPos, float percentage) {
-	XMFLOAT3 result = initialPos;
-	result.x += (endingPos.x - initialPos.x) * percentage;
-	result.y += (endingPos.y - initialPos.y) * percentage;
-	result.z += (endingPos.z - initialPos.z) * percentage;
+	XMFLOAT3 result;
+	XMVECTOR pos0 = XMLoadFloat3(&initialPos);
+	XMVECTOR pos1 = XMLoadFloat3(&endingPos);
+
+	pos0 += (pos1 - pos0) * percentage;
+	XMStoreFloat3(&result, pos0);
 	return result;
 }
 
-
+//337
 float GetDistance3D(XMFLOAT3 pos1, XMFLOAT3 pos2) {
 	return (float)sqrt((pos1.x - pos2.x) * (pos1.x - pos2.x) + (pos1.y - pos2.y) * (pos1.y - pos2.y) + (pos1.z - pos2.z) * (pos1.z - pos2.z));
 }

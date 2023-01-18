@@ -108,6 +108,9 @@
     <ClInclude Include="tutorial.h">
       <Filter>ヘッダー ファイル\UI</Filter>
     </ClInclude>
+    <ClInclude Include="skydome.h">
+      <Filter>ヘッダー ファイル\ゲームオブジェクト</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="collision.cpp">
@@ -184,6 +187,9 @@
     </ClCompile>
     <ClCompile Include="score.cpp">
       <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="skydome.cpp">
+      <Filter>ソース ファイル\ゲームオブジェクト</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

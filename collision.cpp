@@ -221,6 +221,60 @@ bool RayCast(XMFLOAT3 xp0, XMFLOAT3 xp1, XMFLOAT3 xp2, XMFLOAT3 xpos0, XMFLOAT3 
 
 	return(true);	// 当たっている！(hitには当たっている交点が入っている。normalには法線が入っている)
 }
+bool SphereTriCollision(float radius, XMFLOAT3 sphereCenter, XMFLOAT3 triPoint0, XMFLOAT3 triPoint1, XMFLOAT3 triPoint2)
+{
+	XMVECTOR	triPointa = XMLoadFloat3(&triPoint0);
+	XMVECTOR	triPointb = XMLoadFloat3(&triPoint1);
+	XMVECTOR	triPointc = XMLoadFloat3(&triPoint2);
+
+	XMVECTOR	spherePosition = XMLoadFloat3(&sphereCenter);
+	XMVECTOR	normalVector;
+	XMVECTOR	vectorab = triPointb - triPointa;
+	XMVECTOR	vectorac = triPointc - triPointa;
+	XMVECTOR	vectorbc = triPointc - triPointa;
+	XMVECTOR	vectorca = triPointc - triPointa;
+
+	normalVector = XMVector3Normalize(XMVector3Cross(vectorab, vectorac));
+	float distance = dotProduct(&(spherePosition - triPointa), &normalVector);
+
+	if (distance > radius || distance < -radius)
+		return false;
+
+	XMVECTOR	projectedPoint = spherePosition - normalVector * distance;
+	XMVECTOR	CheckPointa = XMVector3Cross(projectedPoint - triPointa, vectorab);
+	XMVECTOR	CheckPointb = XMVector3Cross(projectedPoint - triPointb, vectorbc);
+	XMVECTOR	CheckPointc = XMVector3Cross(projectedPoint - triPointc, vectorca);
+
+	bool inside = dotProduct(&CheckPointa, &normalVector) <= 0
+		&& dotProduct(&CheckPointb, &normalVector) <= 0
+		&& dotProduct(&CheckPointc, &normalVector) <= 0;
+
+
+}
+bool CapsuleCollision(float radius,XMFLOAT3 pos0,XMFLOAT3 pos1, XMFLOAT3 xp0, XMFLOAT3 xp1, XMFLOAT3 xp2, XMFLOAT3* hit, XMFLOAT3* normal) 
+{
+	XMVECTOR	triPointa = XMLoadFloat3(&xp0);
+	XMVECTOR	triPointb = XMLoadFloat3(&xp1);
+	XMVECTOR	triPointc = XMLoadFloat3(&xp2);
+
+	XMVECTOR	spherePositiona = XMLoadFloat3(&pos0);
+	XMVECTOR	spherePositionb = XMLoadFloat3(&pos1);
+
+	XMVECTOR	normalVector;	
+	XMVECTOR	vectorab = triPointb - triPointa;
+	XMVECTOR	vectorac = triPointc - triPointa;
+	float		distance;
+
+	
+
+	
+
+	
+
+	XMVECTOR projectionPoint = spherePositiona ;
+
+	return true;
+}
 
 //=============================================================================
 // ギルバート・ジョンソン・キールティ距離アルゴリズム

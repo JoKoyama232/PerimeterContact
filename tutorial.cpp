@@ -30,8 +30,7 @@ static ID3D11Buffer* g_VertexBuffer = NULL;				// 頂点情報
 static ID3D11ShaderResourceView* g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
 static char* g_TexturName[TEXTURE_MAX] = {
-	"data/TEXTURE/bg000.jpg",
-	"data/TEXTURE/tutorial_text.png",
+	"data/TEXTURE/tutorial01.png",
 };
 
 

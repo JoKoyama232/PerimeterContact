@@ -26,12 +26,12 @@
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static ID3D11Buffer				*g_VertexBuffer = NULL;				// 頂点情報
-static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
+static ID3D11Buffer* g_VertexBuffer = NULL;				// 頂点情報
+static ID3D11ShaderResourceView* g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
-static char *g_TexturName[TEXTURE_MAX] = {
-	"data/TEXTURE/bg000.jpg",
-	"data/TEXTURE/title_text.png",
+static char* g_TexturName[TEXTURE_MAX] = {
+	"data/TEXTURE/sunrise.jpg",
+	"data/TEXTURE/title.png",
 	"data/TEXTURE/effect000.jpg",
 };
 
@@ -55,7 +55,7 @@ static float	effect_dy;
 //=============================================================================
 HRESULT InitTitle(void)
 {
-	ID3D11Device *pDevice = GetDevice();
+	ID3D11Device* pDevice = GetDevice();
 
 	//テクスチャ生成
 	for (int i = 0; i < TEXTURE_MAX; i++)
@@ -81,10 +81,10 @@ HRESULT InitTitle(void)
 
 
 	// 変数の初期化
-	g_Use   = TRUE;
-	g_w     = TEXTURE_WIDTH;
-	g_h     = TEXTURE_HEIGHT;
-	g_Pos   = XMFLOAT3(g_w/2, g_h/2, 0.0f);
+	g_Use = TRUE;
+	g_w = TEXTURE_WIDTH;
+	g_h = TEXTURE_HEIGHT;
+	g_Pos = XMFLOAT3(g_w / 2, g_h / 2, 0.0f);
 	g_TexNo = 0;
 
 	alpha = 1.0f;
@@ -238,6 +238,11 @@ void DrawTitle(void)
 	// Z比較あり
 	SetDepthEnable(true);
 }
+
+
+
+
+
 
 
 

@@ -61,7 +61,7 @@ char	g_DebugStr[2048] = WINDOW_NAME;		// デバッグ文字表示用
 
 #endif
 
-int	g_Mode = MODE_TITLE;					// 起動時の画面を設定
+int	g_Mode = MODE_GAME;					// 起動時の画面を設定
 
 
 //=============================================================================
@@ -498,6 +498,11 @@ void CheckHit(void)
 					// 当たったから未使用に戻す
 					knife[i].state = hit;
 					knife[i].attachedTo = &enemy[j];
+
+					XMVECTOR knifeInfo = XMLoadFloat3(&knife[i].pos);
+					XMVECTOR enemyInfo = XMLoadFloat3(&knife[i].attachedTo->pos);
+					//knifeInfo -= AffineTransform(enemyInfo);
+					XMStoreFloat3(&knife[i].pos,knifeInfo - enemyInfo);
 
 					// スコアを足す
 					AddScore(10);
