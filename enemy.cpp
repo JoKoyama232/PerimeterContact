@@ -9,11 +9,11 @@
 #include "camera.h"
 #include "input.h"
 #include "model.h"
-#include "enemy.h"
 #include "shadow.h"
 #include "meshfield.h"
 #include "collision.h"
 #include "debugproc.h"
+#include "enemy.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -39,7 +39,6 @@ static ENEMY			g_Enemy[MAX_ENEMY];				// エネミー
 static ENEMY		g_Parts[ENEMY_PARTS_MAX];		// エネミーのパーツ用
 
 int g_Enemy_load = 0;
-
 //=============================================================================
 // 初期化処理
 //=============================================================================

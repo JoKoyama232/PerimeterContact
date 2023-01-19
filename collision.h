@@ -26,7 +26,7 @@ struct gjkList {
 	unsigned short length;
 };
 
-struct CapsuleHitBox {
+struct CAPSULEHITBOX {
 	XMFLOAT3 positiona;
 	XMFLOAT3 positionb;
 	float radius;

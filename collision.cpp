@@ -85,13 +85,13 @@ BOOL CollisionBC(XMFLOAT3 pos1, XMFLOAT3 pos2, float r1, float r2)
 //=============================================================================
 // 内積(dot)
 //=============================================================================
-float dotProduct(XMVECTOR *v1, XMVECTOR *v2)
+float dotProduct(XMVECTOR *vectorDA, XMVECTOR *vectorCB)
 {
 #if 0
-	float ans = v1->x * v2->x + v1->y * v2->y + v1->z * v2->z;
+	float ans = vectorDA->x * vectorCB->x + vectorDA->y * vectorCB->y + vectorDA->z * vectorCB->z;
 #else
 	// ダイレクトＸでは、、、
-	XMVECTOR temp = XMVector3Dot(*v1, *v2);
+	XMVECTOR temp = XMVector3Dot(*vectorDA, *vectorCB);
 	float ans = 0.0f;
 	XMStoreFloat(&ans, temp);
 #endif
@@ -99,41 +99,41 @@ float dotProduct(XMVECTOR *v1, XMVECTOR *v2)
 	return(ans);
 }
 
-float dotProductF3(XMFLOAT3 *v1, XMFLOAT3 *v2)
+float dotProductF3(XMFLOAT3 *vectorDA, XMFLOAT3 *vectorCB)
 {
 
-	float ans = v1->x * v2->x + v1->y * v2->y + v1->z * v2->z;
+	float ans = vectorDA->x * vectorCB->x + vectorDA->y * vectorCB->y + vectorDA->z * vectorCB->z;
 
 	return(ans);
 }
 
-bool IsSameDir(XMVECTOR* v1, XMVECTOR* v2) {
-	return dotProduct(v1, v2) > 0;
+bool IsSameDir(XMVECTOR* vectorDA, XMVECTOR* vectorCB) {
+	return dotProduct(vectorDA, vectorCB) > 0;
 }
 
 
 //=============================================================================
 // 外積(cross)
 //=============================================================================
-void crossProduct(XMVECTOR *ret, XMVECTOR *v1, XMVECTOR *v2)
+void crossProduct(XMVECTOR *ret, XMVECTOR *vectorDA, XMVECTOR *vectorCB)
 {
 #if 0
-	ret->x = v1->y * v2->z - v1->z * v2->y;
-	ret->y = v1->z * v2->x - v1->x * v2->z;
-	ret->z = v1->x * v2->y - v1->y * v2->x;
+	ret->x = vectorDA->y * vectorCB->z - vectorDA->z * vectorCB->y;
+	ret->y = vectorDA->z * vectorCB->x - vectorDA->x * vectorCB->z;
+	ret->z = vectorDA->x * vectorCB->y - vectorDA->y * vectorCB->x;
 #else
 	// ダイレクトＸでは、、、
-	*ret = XMVector3Cross(*v1, *v2);
+	*ret = XMVector3Cross(*vectorDA, *vectorCB);
 #endif
 
 }
 
-XMFLOAT3 CrossProductF3( XMFLOAT3* v1, XMFLOAT3* v2)
+XMFLOAT3 CrossProductF3( XMFLOAT3* vectorDA, XMFLOAT3* vectorCB)
 {
 	XMFLOAT3 result;
-	result.x = v1->y * v2->z - v1->z * v2->y;
-	result.y = v1->z * v2->x - v1->x * v2->z;
-	result.z = v1->x * v2->y - v1->y * v2->x;
+	result.x = vectorDA->y * vectorCB->z - vectorDA->z * vectorCB->y;
+	result.y = vectorDA->z * vectorCB->x - vectorDA->x * vectorCB->z;
+	result.z = vectorDA->x * vectorCB->y - vectorDA->y * vectorCB->x;
 	return result;
 
 
@@ -160,7 +160,7 @@ bool RayCast(XMFLOAT3 xp0, XMFLOAT3 xp1, XMFLOAT3 xp2, XMFLOAT3 xpos0, XMFLOAT3 
 	XMVECTOR	nor;	// ポリゴンの法線
 	XMVECTOR	vec1;
 	XMVECTOR	vec2;
-	float		d1, d2;
+	float		distanceDASquared, distanceCBSquared;
 
 	{	// ポリゴンの外積をとって法線を求める(この処理は固定物なら予めInit()で行っておくと良い)
 		vec1 = p1 - p0;
@@ -174,9 +174,9 @@ bool RayCast(XMFLOAT3 xp0, XMFLOAT3 xp1, XMFLOAT3 xp2, XMFLOAT3 xpos0, XMFLOAT3 
 	vec1 = pos0 - p0;
 	vec2 = pos1 - p0;
 	{	// 求めたポリゴンの法線と２つのベクトル（線分の両端とポリゴン上の任意の点）の内積とって衝突している可能性を調べる
-		d1 = dotProduct(&vec1, &nor);
-		d2 = dotProduct(&vec2, &nor);
-		if (((d1 * d2) > 0.0f) || (d1 == 0 && d2 == 0))
+		distanceDASquared = dotProduct(&vec1, &nor);
+		distanceCBSquared = dotProduct(&vec2, &nor);
+		if (((distanceDASquared * distanceCBSquared) > 0.0f) || (distanceDASquared == 0 && distanceCBSquared == 0))
 		{
 			// 当たっている可能性は無い
 			return(false);
@@ -185,9 +185,9 @@ bool RayCast(XMFLOAT3 xp0, XMFLOAT3 xp1, XMFLOAT3 xp2, XMFLOAT3 xpos0, XMFLOAT3 
 
 
 	{	// ポリゴンと線分の交点を求める
-		d1 = (float)fabs(d1);	// 絶対値を求めている
-		d2 = (float)fabs(d2);	// 絶対値を求めている
-		float a = d1 / (d1 + d2);							// 内分比
+		distanceDASquared = (float)fabs(distanceDASquared);	// 絶対値を求めている
+		distanceCBSquared = (float)fabs(distanceCBSquared);	// 絶対値を求めている
+		float a = distanceDASquared / (distanceDASquared + distanceCBSquared);							// 内分比
 
 		XMVECTOR	vec3 = (1 - a) * vec1 + a * vec2;		// p0から交点へのベクトル
 		XMVECTOR	p3 = p0 + vec3;							// 交点
@@ -196,9 +196,9 @@ bool RayCast(XMFLOAT3 xp0, XMFLOAT3 xp1, XMFLOAT3 xp2, XMFLOAT3 xpos0, XMFLOAT3 
 		{	// 求めた交点がポリゴンの中にあるか調べる
 
 			// ポリゴンの各辺のベクトル
-			XMVECTOR	v1 = p1 - p0;
-			XMVECTOR	v2 = p2 - p1;
-			XMVECTOR	v3 = p0 - p2;
+			XMVECTOR	vectorDA = p1 - p0;
+			XMVECTOR	vectorCB = p2 - p1;
+			XMVECTOR	vectorDB = p0 - p2;
 
 			// 各頂点と交点とのベクトル
 			XMVECTOR	v4 = p3 - p1;
@@ -208,13 +208,13 @@ bool RayCast(XMFLOAT3 xp0, XMFLOAT3 xp1, XMFLOAT3 xp2, XMFLOAT3 xpos0, XMFLOAT3 
 			// 外積で各辺の法線を求めて、ポリゴンの法線との内積をとって符号をチェックする
 			XMVECTOR	n1, n2, n3;
 
-			crossProduct(&n1, &v4, &v1);
+			crossProduct(&n1, &v4, &vectorDA);
 			if (dotProduct(&n1, &nor) < 0.0f) return(false);	// 当たっていない
 
-			crossProduct(&n2, &v5, &v2);
+			crossProduct(&n2, &v5, &vectorCB);
 			if (dotProduct(&n2, &nor) < 0.0f) return(false);	// 当たっていない
 			
-			crossProduct(&n3, &v6, &v3);
+			crossProduct(&n3, &v6, &vectorDB);
 			if (dotProduct(&n3, &nor) < 0.0f) return(false);	// 当たっていない
 		}
 	}
@@ -307,7 +307,7 @@ bool SphereTriCollision(float radius, XMFLOAT3 sphereCenter, XMFLOAT3 triPoint0,
 			}
 
 			d = spherePosition - pointc;
-			float distsq = dotProduct(&d, &d);
+			distsq = dotProduct(&d, &d);
 			if (distsq < leastDistanceSquared)
 			{
 				distsq = leastDistanceSquared;
@@ -324,64 +324,57 @@ bool SphereTriCollision(float radius, XMFLOAT3 sphereCenter, XMFLOAT3 triPoint0,
 	
 
 }
-bool CapsuleCollision(float radius,XMFLOAT3 pos0,XMFLOAT3 pos1, XMFLOAT3 xp0, XMFLOAT3 xp1, XMFLOAT3 xp2, XMFLOAT3* hit, XMFLOAT3* normal) 
+
+bool CapsuleCollision(CAPSULEHITBOX a, CAPSULEHITBOX b)
 {
-	XMVECTOR	triPointa = XMLoadFloat3(&xp0);
-	XMVECTOR	triPointb = XMLoadFloat3(&xp1);
-	XMVECTOR	triPointc = XMLoadFloat3(&xp2);
-
-	XMVECTOR	spherePositiona = XMLoadFloat3(&pos0);
-	XMVECTOR	spherePositionb = XMLoadFloat3(&pos1);
-
-	XMVECTOR	normalVector;	
-	XMVECTOR	vectorab = triPointb - triPointa;
-	XMVECTOR	vectorac = triPointc - triPointa;
-	float		distance;
 	// capsule A:
-	float3 a_Normal = normalize(a.tip – a.base);
-	float3 a_LineEndOffset = a_Normal * a.radius;
-	float3 a_A = a.base + a_LineEndOffset;
-	float3 a_B = a.tip - a_LineEndOffset;
-
+	XMVECTOR capsuleAPointA = XMLoadFloat3(&a.positiona);
+	XMVECTOR capsuleAPointB = XMLoadFloat3(&a.positionb);
+	XMVECTOR capsuleANormal = XMVector3Normalize(capsuleAPointB - capsuleAPointA); ;
+	XMVECTOR capsuleAOffsetAB = capsuleANormal * a.radius;
+	
 	// capsule B:
-	float3 b_Normal = normalize(b.tip – b.base);
-	float3 b_LineEndOffset = b_Normal * b.radius;
-	float3 b_A = b.base + b_LineEndOffset;
-	float3 b_B = b.tip - b_LineEndOffset;
+	XMVECTOR capsuleBPointC = XMLoadFloat3(&b.positiona);
+	XMVECTOR capsuleBPointD = XMLoadFloat3(&b.positionb);
+	XMVECTOR capsuleBNormal = XMVector3Normalize(capsuleBPointD - capsuleBPointC); ;
+	XMVECTOR capsuleBOffsetAB = capsuleBNormal * b.radius;
 
-	// vectors between line endpoints:
-	float3 v0 = b_A – a_A;
-	float3 v1 = b_B – a_A;
-	float3 v2 = b_A – a_B;
-	float3 v3 = b_B – a_B;
+	// カプセルの球の座標
+	XMVECTOR vectorCA = capsuleBPointC - capsuleAPointA;
+	XMVECTOR vectorDA = capsuleBPointD - capsuleAPointA;
+	XMVECTOR vectorCB = capsuleBPointC - capsuleAPointB;
+	XMVECTOR vectorDB = capsuleBPointD - capsuleAPointB;
 
-	// squared distances:
-	float d0 = dot(v0, v0);
-	float d1 = dot(v1, v1);
-	float d2 = dot(v2, v2);
-	float d3 = dot(v3, v3);
+	// 距離の二乗
+	float distanceCASquared = dotProduct(&vectorCA, &vectorCA);
+	float distanceDASquared = dotProduct(&vectorDA, &vectorDA);
+	float distanceCBSquared = dotProduct(&vectorCB, &vectorCB);
+	float distanceDBSquared = dotProduct(&vectorDB, &vectorDB);
 
-	// select best potential endpoint on capsule A:
-	float3 bestA;
-	if (d2 < d0 || d2 < d1 || d3 < d0 || d3 < d1)
+	// 一番近い点を判断
+	XMVECTOR capsuleABestPosition;
+	if (distanceCBSquared < distanceCASquared 
+		|| distanceCBSquared < distanceDASquared 
+		|| distanceDBSquared < distanceCASquared 
+		|| distanceDBSquared < distanceDASquared)
 	{
-		bestA = a_B;
+		capsuleABestPosition = capsuleAPointB;
 	}
 	else
 	{
-		bestA = a_A;
+		capsuleABestPosition = capsuleAPointA;
 	}
 
-	// select point on capsule B line segment nearest to best potential endpoint on A capsule:
-	float3 bestB = ClosestPointOnLineSegment(b_A, b_B, bestA);
-		float3 penetration_normal = bestA – bestB;
-	float len = length(penetration_normal);
-	penetration_normal /= len;  // normalize
-	float penetration_depth = a.radius + b.radius – len;
+	// かぷせるB上に一番近い点を探す
+	XMVECTOR capsuleBBestPosition = ClosestPointOnLineAB(capsuleBPointC, capsuleBPointD, capsuleABestPosition);
+	XMVECTOR capsuleOverlap = capsuleABestPosition - capsuleBBestPosition;
+	float len = sqrtf(dotProduct(&capsuleOverlap, &capsuleOverlap));
+	capsuleOverlap /= len;  // normalize
+	float penetration_depth = a.radius + b.radius - len;
 	bool intersects = penetration_depth > 0;
 
-	// now do the same for capsule A segment:
-	bestA = ClosestPointOnLineSegment(a_A, a_B, bestB);
+	// かぷせるAも同じく
+	capsuleABestPosition = ClosestPointOnLineAB(capsuleAPointA, capsuleAPointB, capsuleBBestPosition);
 
 	return true;
 }
