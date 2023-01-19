@@ -151,9 +151,13 @@ void DrawKnife(void)
 		mtxTranslate = XMMatrixTranslation(g_Knife[i].pos.x, g_Knife[i].pos.y, g_Knife[i].pos.z);
 		mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
 
-		if (g_Knife[i].state == hit && g_Knife[i].attachedTo != NULL)
+		if (g_Knife[i].state == hit && g_Knife[i].attachedTo != NULL) {
+			// 回転を反映
+			mtxRot = XMMatrixRotationRollPitchYaw(-g_Knife[i].parentRot.z, -g_Knife[i].parentRot.y +XM_PI, -g_Knife[i].parentRot.x);
+			mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
 			mtxWorld = XMMatrixMultiply(mtxWorld, XMLoadFloat4x4(&g_Knife[i].attachedTo->mtxWorld));
-		
+
+		}
 		// ワールドマトリックスの設定
 		SetWorldMatrix(&mtxWorld);
 

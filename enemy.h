@@ -38,7 +38,7 @@ struct ENEMY
 	INTERPOLATION_DATA	*tbl_adr;			// アニメデータのテーブル先頭アドレス
 	int					tbl_size;			// 登録したテーブルのレコード総数
 	float				move_time;			// 実行時間
-	CAPSULEHITBOX		cHitbox;
+
 
 	ENEMY* attachedTo;	// 自分が親ならNULL、自分が子供なら親のplayerアドレス
 

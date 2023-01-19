@@ -34,6 +34,7 @@ struct KNIFE
 	XMFLOAT3	pos;								// モデルの位置
 	XMFLOAT3	rot;								// モデルの向き(回転)
 	XMFLOAT3	scl;								// モデルの大きさ(スケール)
+	XMFLOAT3	parentRot;							// 当たったオブジェクトの向き
 
 	// ゲームロジック変数群
 	ENEMY*		attachedTo;							// 当たったエネミー

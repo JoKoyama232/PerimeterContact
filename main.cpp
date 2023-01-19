@@ -495,14 +495,19 @@ void CheckHit(void)
 				//GJKの当たり判定
 				if (GJKHit(knife[i].hitbox.list, knife[i].modelVertexPosition.VertexNum, enemyVerts, enemy[j].points.VertexNum))
 				{
+					XMMATRIX mtxWorld, mtxRot;
+					mtxWorld = XMMatrixIdentity();
+					mtxRot = XMMatrixRotationRollPitchYaw(-knife[i].rot.x, -knife[i].rot.y, -knife[i].rot.z);
+					mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
 					// 当たったから未使用に戻す
 					knife[i].state = hit;
 					knife[i].attachedTo = &enemy[j];
-
+					knife[i].parentRot = knife[i].attachedTo->rot;
 					XMVECTOR knifeInfo = XMLoadFloat3(&knife[i].pos);
 					XMVECTOR enemyInfo = XMLoadFloat3(&knife[i].attachedTo->pos);
-					//knifeInfo -= AffineTransform(enemyInfo);
-					XMStoreFloat3(&knife[i].pos,knifeInfo - enemyInfo);
+					knifeInfo -= enemyInfo;
+					XMStoreFloat3(&knife[i].pos,knifeInfo);
+					/*knife[i].pos = AffineTransform(knife[i].pos, mtxRot);*/
 
 					// スコアを足す
 					AddScore(10);
