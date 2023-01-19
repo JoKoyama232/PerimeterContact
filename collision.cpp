@@ -221,6 +221,18 @@ bool RayCast(XMFLOAT3 xp0, XMFLOAT3 xp1, XMFLOAT3 xp2, XMFLOAT3 xpos0, XMFLOAT3 
 
 	return(true);	// 当たっている！(hitには当たっている交点が入っている。normalには法線が入っている)
 }
+
+XMVECTOR ClosestPointOnLineAB(XMVECTOR a, XMVECTOR b, XMVECTOR p) {
+	XMVECTOR ab = b - a;
+	XMVECTOR result;
+	float percentage = dotProduct(&(p - a), &ab) / dotProduct(&ab, &ab);
+
+	if (percentage > 1.0f)percentage = 1.0f;
+	if (percentage < 0.0f)percentage = 0.0f;
+	result = a + percentage * ab;
+
+	return result;
+}
 bool SphereTriCollision(float radius, XMFLOAT3 sphereCenter, XMFLOAT3 triPoint0, XMFLOAT3 triPoint1, XMFLOAT3 triPoint2)
 {
 	XMVECTOR	triPointa = XMLoadFloat3(&triPoint0);
@@ -245,10 +257,71 @@ bool SphereTriCollision(float radius, XMFLOAT3 sphereCenter, XMFLOAT3 triPoint0,
 	XMVECTOR	CheckPointb = XMVector3Cross(projectedPoint - triPointb, vectorbc);
 	XMVECTOR	CheckPointc = XMVector3Cross(projectedPoint - triPointc, vectorca);
 
-	bool inside = dotProduct(&CheckPointa, &normalVector) <= 0
+	bool isInsideSphere = dotProduct(&CheckPointa, &normalVector) <= 0
 		&& dotProduct(&CheckPointb, &normalVector) <= 0
 		&& dotProduct(&CheckPointc, &normalVector) <= 0;
 
+
+	float radiusSquared = radius * radius;
+
+	// 頂点a
+	XMVECTOR pointa = ClosestPointOnLineAB(triPointa, triPointb, spherePosition);
+	XMVECTOR va = spherePosition - pointa;
+	float distsqa = dotProduct(&va,&va);
+	bool intersectsTri = distsqa < radiusSquared;
+
+	// 頂点b
+	XMVECTOR pointb = ClosestPointOnLineAB(triPointb, triPointc, spherePosition);
+	XMVECTOR vb = spherePosition - pointb;
+	float distsqb = dotProduct(&vb, &vb);
+	if(!intersectsTri) intersectsTri = distsqb < radiusSquared;
+
+	// 頂点c
+	XMVECTOR pointc = ClosestPointOnLineAB(triPointc, triPointa, spherePosition);
+	XMVECTOR vc = spherePosition - pointc;
+	float distsqc = dotProduct(&vc, &vc);
+	if (!intersectsTri) intersectsTri = distsqc < radiusSquared;
+
+	if (isInsideSphere || intersectsTri) {
+		XMVECTOR bestPoint = projectedPoint;
+		XMVECTOR intersectionVector;
+
+		if (isInsideSphere)
+		{
+			intersectionVector = spherePosition - projectedPoint;
+		}
+		else
+		{
+			XMVECTOR d = spherePosition - pointa;
+			float leastDistanceSquared = dotProduct(&d, &d);
+			bestPoint = pointa;
+			intersectionVector = d;
+
+			d = spherePosition - pointb;
+			float distsq = dotProduct(&d, &d);
+			if (distsq < leastDistanceSquared)
+			{
+				distsq = leastDistanceSquared;
+				bestPoint = pointb;
+				intersectionVector = d;
+			}
+
+			d = spherePosition - pointc;
+			float distsq = dotProduct(&d, &d);
+			if (distsq < leastDistanceSquared)
+			{
+				distsq = leastDistanceSquared;
+				bestPoint = pointc;
+				intersectionVector = d;
+			}
+		}
+		//後で使うのなら入れておこう
+		//XMVECTOR hitNormal = XMVector3Normalize(intersectionVector);
+		//float hitLength = sqrtf(dotProduct(&intersectionVector,&intersectionVector)); 
+		//float hitDepth = radius - hitLength; 
+		return true; 
+	}
+	
 
 }
 bool CapsuleCollision(float radius,XMFLOAT3 pos0,XMFLOAT3 pos1, XMFLOAT3 xp0, XMFLOAT3 xp1, XMFLOAT3 xp2, XMFLOAT3* hit, XMFLOAT3* normal) 

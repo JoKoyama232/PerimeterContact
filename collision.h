@@ -26,6 +26,12 @@ struct gjkList {
 	unsigned short length;
 };
 
+struct CapsuleHitBox {
+	XMFLOAT3 positiona;
+	XMFLOAT3 positionb;
+	float radius;
+};
+
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
