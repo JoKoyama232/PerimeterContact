@@ -38,7 +38,7 @@
 //*****************************************************************************
 static ENEMY			g_Enemy[MAX_ENEMY];				// エネミー
 static ENEMY		g_Parts[ENEMY_PARTS_MAX];		// エネミーのパーツ用
-
+float				floating =0;
 int g_Enemy_load = 0;
 //=============================================================================
 // 初期化処理
@@ -51,6 +51,9 @@ HRESULT InitEnemy(void)
 		g_Enemy[i].load = true;
 
 		g_Enemy[i].pos = XMFLOAT3(0.0f, ENEMY_OFFSET_Y, 20.0f);
+		g_Enemy[i].hitbox.positiona = { 0.0f, 3.0f, 0.0f };
+		g_Enemy[i].hitbox.positionb = { 0.0f,2* ENEMY_OFFSET_Y-3.0f, 0.0f };
+		g_Enemy[i].hitbox.radius = 3.0f;
 		g_Enemy[i].rot = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		g_Enemy[i].scl = XMFLOAT3(1.0f, 1.0f, 1.0f);
 		g_Enemy[i].hp = 20;
@@ -151,7 +154,10 @@ void UpdateEnemy(void)
 	{
 		if (g_Enemy[i].use != true)	continue;		// このエネミーが使われている？
 													// Yes
-		
+		if (GetKeyboardPress(DIK_P))
+		{	// 前へ移動
+			g_Enemy[i].pos.y -= 1.0f;
+		}
 		g_Enemy[i].rot.y += XM_PI * 0.01f;
 		// 影もプレイヤーの位置に合わせる
 		XMFLOAT3 pos = g_Enemy[i].pos;

@@ -41,6 +41,7 @@ BOOL CollisionBC(XMFLOAT3 pos1, XMFLOAT3 pos2, float r1, float r2);
 float dotProduct(XMVECTOR *v1, XMVECTOR *v2);
 float dotProductF3(XMFLOAT3 *v1, XMFLOAT3 *v2);
 
+bool CapsuleCollision(CAPSULEHITBOX a, CAPSULEHITBOX b);
 
 XMVECTOR FindFurthestPointFrom(XMVECTOR direction, XMFLOAT3* gjkList, unsigned short size);
 XMVECTOR FindSupportPoint(XMVECTOR direction, XMFLOAT3* gjkListA, unsigned short aSize, XMFLOAT3* gjkListB, unsigned short bSize);

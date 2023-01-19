@@ -8,8 +8,9 @@
 #include "renderer.h"
 #include "input.h"
 #include "model.h"
-#include "enemy.h"
 #include "collision.h"
+#include "enemy.h"
+
 #include "knife.h"
 
 //*****************************************************************************

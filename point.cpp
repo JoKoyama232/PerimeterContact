@@ -9,10 +9,10 @@
 #include "camera.h"
 #include "model.h"
 #include "light.h"
+#include "collision.h"
 #include "player.h"
 #include "enemy.h"
 #include "point.h"
-#include "collision.h"
 #include "input.h"
 #include "debugproc.h"
 //*****************************************************************************
@@ -82,6 +82,9 @@ HRESULT InitPoint(void)
 	g_TexNo = 0;
 	g_pointidx = 0;
 	PLAYER* player = GetPlayer();
+	CAPSULEHITBOX playerCapsule = player->hitbox;
+	playerCapsule.positiona = AffineTransform(player->hitbox.positiona, XMLoadFloat4x4(&player->mtxWorld));
+	playerCapsule.positionb = AffineTransform(player->hitbox.positionb, XMLoadFloat4x4(&player->mtxWorld));
 	// パーティクルワークの初期化
 	for (short playerModelVertexCount = 0; playerModelVertexCount < player->points.VertexNum ; playerModelVertexCount++)
 	{
@@ -244,6 +247,48 @@ void DrawPoint(void)
 		GetDeviceContext()->Draw(4, 0);
 		
 	}
+
+	CAPSULEHITBOX playerCapsule = player->hitbox;
+	playerCapsule.positiona.y += playerCapsule.radius;
+	playerCapsule.positiona = AffineTransform(player->hitbox.positiona, XMLoadFloat4x4(&player->mtxWorld));
+	playerCapsule.positionb = AffineTransform(player->hitbox.positionb, XMLoadFloat4x4(&player->mtxWorld));
+
+	// ワールドマトリックスの初期化
+	mtxWorld = XMMatrixIdentity();
+
+	//ビューマトリックスを取得
+	mtxView = XMLoadFloat4x4(&cam->mtxView);
+
+	////mtxWorld = XMMatrixInverse(nullptr, mtxView);
+	////mtxWorld.r[3].m128_f32[0] = 0.0f;
+	////mtxWorld.r[3].m128_f32[1] = 0.0f;
+	////mtxWorld.r[3].m128_f32[2] = 0.0f;
+
+	// 処理が速いしお勧め
+	mtxWorld.r[0].m128_f32[0] = mtxView.r[0].m128_f32[0];
+	mtxWorld.r[0].m128_f32[1] = mtxView.r[1].m128_f32[0];
+	mtxWorld.r[0].m128_f32[2] = mtxView.r[2].m128_f32[0];
+
+	mtxWorld.r[1].m128_f32[0] = mtxView.r[0].m128_f32[1];
+	mtxWorld.r[1].m128_f32[1] = mtxView.r[1].m128_f32[1];
+	mtxWorld.r[1].m128_f32[2] = mtxView.r[2].m128_f32[1];
+
+	mtxWorld.r[2].m128_f32[0] = mtxView.r[0].m128_f32[2];
+	mtxWorld.r[2].m128_f32[1] = mtxView.r[1].m128_f32[2];
+	mtxWorld.r[2].m128_f32[2] = mtxView.r[2].m128_f32[2];
+
+	// 移動を反映
+	mtxTranslate = XMMatrixTranslation(playerCapsule.positiona.x, playerCapsule.positiona.y, playerCapsule.positiona.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
+
+	// ワールドマトリックスの設定
+	SetWorldMatrix(&mtxWorld);
+
+	// マテリアル設定
+	SetMaterial(g_PlayerModelVerticies[0].material);
+
+	// ポリゴンの描画
+	GetDeviceContext()->Draw(4, 0);
 
 	ENEMY* enemy = GetEnemy();
 	for (int enemyModelVertexCount = 0; enemyModelVertexCount < enemy[0].points.VertexNum; enemyModelVertexCount++)

@@ -9,7 +9,6 @@
 #include "camera.h"
 #include "debugproc.h"
 #include "model.h"
-#include "player.h"
 #include "shadow.h"
 #include "light.h"
 #include "bullet.h"
@@ -18,6 +17,8 @@
 #include "collision.h"
 #include "enemy.h"
 #include "knife.h"
+#include "player.h"
+
 
 //*****************************************************************************
 // マクロ定義
@@ -105,6 +106,9 @@ HRESULT InitPlayer(void)
 	g_Player.spd = 0.0f;			// 移動スピードクリア
 	g_Player.size = PLAYER_SIZE;	// 当たり判定の大きさ
 	g_Player.tblNo = -1;
+	g_Player.hitbox.positiona = { 0.0f, 3.0f, 0.0f };
+	g_Player.hitbox.positionb = { 0.0f, PLAYER_OFFSET_Y * 2.0f -3.0f, 0.0f };
+	g_Player.hitbox.radius = 3.0f;
 	g_Player.use = true;
 
 	// ここでプレイヤー用の影を作成している

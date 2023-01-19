@@ -10,6 +10,7 @@
 #include "camera.h"
 #include "debugproc.h"
 #include "model.h"
+#include "collision.h"
 #include "player.h"
 #include "enemy.h"
 #include "shadow.h"
@@ -17,7 +18,6 @@
 #include "meshfield.h"
 #include "meshwall.h"
 #include "tree.h"
-#include "collision.h"
 #include "bullet.h"
 #include "score.h"
 #include "sound.h"
@@ -432,13 +432,18 @@ void CheckHit(void)
 	KNIFE  *knife  = GetKnife();	// ナイフのポインターを初期化
 	
 	XMFLOAT3 *playerVerts = new XMFLOAT3[player->points.VertexNum];
+	CAPSULEHITBOX playerCapsule = player->hitbox;
+	playerCapsule.positiona = AffineTransform(player->hitbox.positiona, XMLoadFloat4x4(&player->mtxWorld));
+	playerCapsule.positionb = AffineTransform(player->hitbox.positionb, XMLoadFloat4x4(&player->mtxWorld));
+	
 	if (!playerVerts == NULL) {
 
 
 		for (int p = 0; p < player->points.VertexNum; p++) {
 			playerVerts[p] = AffineTransform(player->points.VertexArray[p], XMLoadFloat4x4(&player->mtxWorld));
 		}
-		PrintDebugProc("Player:X:%f Y:%f Z:%f\n", playerVerts[0].x, playerVerts[0].y, playerVerts[0].z);
+		PrintDebugProc("Player:X:%f Y:%f Z:%f\n", playerCapsule.positiona.x, playerCapsule.positiona.y, playerCapsule.positiona.z);
+		PrintDebugProc("Player:X:%f Y:%f Z:%f\n", playerCapsule.positionb.x, playerCapsule.positionb.y, playerCapsule.positionb.z);
 		PrintDebugProc("Player:vert:%d\n", player->points.VertexNum);
 		// 敵とプレイヤーキャラ
 		for (int i = 0; i < MAX_ENEMY; i++)
@@ -448,15 +453,19 @@ void CheckHit(void)
 				continue;
 
 			XMFLOAT3* enemyVerts = new XMFLOAT3[enemy[i].points.VertexNum];
+			CAPSULEHITBOX enemyCapsule = enemy[i].hitbox;
+			enemyCapsule.positiona = AffineTransform(enemyCapsule.positiona, XMLoadFloat4x4(&enemy[i].mtxWorld));
+			enemyCapsule.positionb = AffineTransform(enemyCapsule.positionb, XMLoadFloat4x4(&enemy[i].mtxWorld));
 			if (!enemyVerts == NULL) {
 				for (int p = 0; p < enemy[i].points.VertexNum; p++) {
 					enemyVerts[p] = AffineTransform(enemy[i].points.VertexArray[p], XMLoadFloat4x4(&enemy[i].mtxWorld));
 				}
-				PrintDebugProc("Enemy:X:%f Y:%f Z:%f\n", enemyVerts[0].x, enemyVerts[0].y, enemyVerts[0].z);
+				PrintDebugProc("Enemyhit:X:%f Y:%f Z:%f\n", enemyCapsule.positiona.x, enemyCapsule.positiona.y, enemyCapsule.positiona.z);
+				PrintDebugProc("Enemyhit:X:%f Y:%f Z:%f\n", enemyCapsule.positionb.x, enemyCapsule.positionb.y, enemyCapsule.positionb.z);
 				PrintDebugProc("Enemy:vert:%d\n", enemy[0].points.VertexNum);
-
+				//GJKHit(playerVerts, player->points.VertexNum, enemyVerts, enemy[i].points.VertexNum)
 				//BCの当たり判定
-				if (GJKHit(playerVerts, player->points.VertexNum, enemyVerts, enemy[i].points.VertexNum))
+				if (CapsuleCollision(playerCapsule,enemyCapsule))
 				{
 					// 敵キャラクターは倒される
 					/*enemy[i].use = false;*/

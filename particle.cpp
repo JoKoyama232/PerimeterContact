@@ -12,6 +12,7 @@
 #include "shadow.h"
 #include "light.h"
 #include "particle.h"
+#include "collision.h"
 #include "player.h"
 
 //*****************************************************************************

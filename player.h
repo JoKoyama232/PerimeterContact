@@ -29,6 +29,7 @@ struct PLAYER
 	bool				load;
 	DX11_MODEL			model;		// モデル情報
 	VERTEX_DATA			points;
+	CAPSULEHITBOX		hitbox;
 	float				spd;		// 移動スピード
 	float				dir;		// 向き
 	float				size;		// 当たり判定の大きさ

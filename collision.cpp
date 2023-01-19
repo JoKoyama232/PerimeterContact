@@ -332,12 +332,15 @@ bool CapsuleCollision(CAPSULEHITBOX a, CAPSULEHITBOX b)
 	XMVECTOR capsuleAPointB = XMLoadFloat3(&a.positionb);
 	XMVECTOR capsuleANormal = XMVector3Normalize(capsuleAPointB - capsuleAPointA); ;
 	XMVECTOR capsuleAOffsetAB = capsuleANormal * a.radius;
-	
+	capsuleAPointA += capsuleAOffsetAB;
+	capsuleAPointB -= capsuleAOffsetAB;
 	// capsule B:
 	XMVECTOR capsuleBPointC = XMLoadFloat3(&b.positiona);
 	XMVECTOR capsuleBPointD = XMLoadFloat3(&b.positionb);
 	XMVECTOR capsuleBNormal = XMVector3Normalize(capsuleBPointD - capsuleBPointC); ;
 	XMVECTOR capsuleBOffsetAB = capsuleBNormal * b.radius;
+	capsuleBPointC += capsuleBOffsetAB;
+	capsuleBPointD -= capsuleBOffsetAB;
 
 	// カプセルの球の座標
 	XMVECTOR vectorCA = capsuleBPointC - capsuleAPointA;
@@ -367,16 +370,14 @@ bool CapsuleCollision(CAPSULEHITBOX a, CAPSULEHITBOX b)
 
 	// かぷせるB上に一番近い点を探す
 	XMVECTOR capsuleBBestPosition = ClosestPointOnLineAB(capsuleBPointC, capsuleBPointD, capsuleABestPosition);
-	XMVECTOR capsuleOverlap = capsuleABestPosition - capsuleBBestPosition;
-	float len = sqrtf(dotProduct(&capsuleOverlap, &capsuleOverlap));
-	capsuleOverlap /= len;  // normalize
-	float penetration_depth = a.radius + b.radius - len;
-	bool intersects = penetration_depth > 0;
-
 	// かぷせるAも同じく
 	capsuleABestPosition = ClosestPointOnLineAB(capsuleAPointA, capsuleAPointB, capsuleBBestPosition);
 
-	return true;
+	XMVECTOR capsuleOverlap = capsuleABestPosition - capsuleBBestPosition;
+	float len = sqrtf(dotProduct(&capsuleOverlap, &capsuleOverlap));
+	capsuleOverlap /= len;  
+	float penetration_depth = a.radius + b.radius - len;
+	return penetration_depth > 0;
 }
 
 //=============================================================================
