@@ -30,7 +30,8 @@ static MDL		g_Sky;						// プレイヤー
 //=============================================================================
 HRESULT InitSky(void)
 {
-	//LoadModel(MODEL_SKY, &g_Sky.model, true);
+	VERTEX_DATA t;
+	LoadModel(MODEL_SKY, &g_Sky.model, false,&t);
 	g_Sky.load = true;
 
 	g_Sky.pos = { 0.0f, 0.0f, 0.0f };
@@ -59,7 +60,7 @@ void UninitSky(void)
 void UpdateSky(void)
 {
 
-	g_Sky.rot.y += 0.0001f;
+	g_Sky.rot.y += 0.001f;
 	{	// ポイントライトのテスト
 		LIGHT* light = GetLightData(1);
 		XMFLOAT3 pos = g_Sky.pos;

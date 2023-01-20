@@ -664,7 +664,8 @@ void AppliedTransform(XMFLOAT3* target,short amount, XMFLOAT3 posArray[], XMMATR
 }
 
 
-void UpdateHitbox(XMFLOAT3* hitboxList, short listSize, XMFLOAT3 vertexPositionList[], XMFLOAT3 position, XMFLOAT3 rotation, XMFLOAT3 scale) {
+void UpdateHitbox(XMFLOAT3* targetHitboxList, short listSize, XMFLOAT3 vertexPositionList[], 
+	XMFLOAT3 position, XMFLOAT3 rotation, XMFLOAT3 scale,XMMATRIX parentMatrix) {
 	// 当たり判定用の変数を更新
 	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
 
@@ -683,6 +684,8 @@ void UpdateHitbox(XMFLOAT3* hitboxList, short listSize, XMFLOAT3 vertexPositionL
 	mtxTranslate = XMMatrixTranslation(position.x, position.y, position.z);
 	mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
 
-	AppliedTransform(hitboxList, listSize, vertexPositionList, mtxWorld);
+	mtxWorld = XMMatrixMultiply(mtxWorld, parentMatrix);
+
+	AppliedTransform(targetHitboxList, listSize, vertexPositionList, mtxWorld);
 }
 

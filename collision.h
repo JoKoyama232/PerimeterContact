@@ -61,4 +61,4 @@ bool GJKHit(XMFLOAT3* gjkListA, unsigned short aSize, XMFLOAT3* gjkListB, unsign
 
 XMFLOAT3 AffineTransform(XMFLOAT3 pos, XMMATRIX mtxWorld);
 void AppliedTransform(XMFLOAT3* target, short amount, XMFLOAT3 posArray[], XMMATRIX mtxWorld);
-void UpdateHitbox(XMFLOAT3* hitboxList, short listSize, XMFLOAT3 vertexPositionList[], XMFLOAT3 position, XMFLOAT3 rotation, XMFLOAT3 scale);
+void UpdateHitbox(XMFLOAT3* hitboxList, short listSize, XMFLOAT3 vertexPositionList[], XMFLOAT3 position, XMFLOAT3 rotation, XMFLOAT3 scale, XMMATRIX parentMatrix);

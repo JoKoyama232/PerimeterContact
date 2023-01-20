@@ -27,6 +27,7 @@
 #include "particle.h"
 #include "point.h"
 #include "knife.h"
+#include "skydome.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -287,6 +288,7 @@ void Update(void)
 		UpdateTutorial();
 		break;
 	case MODE_GAME:
+		UpdateSky();
 		// 地面処理の更新
 		UpdateMeshField();
 
@@ -351,7 +353,7 @@ void Draw(void)
 		pos.y = 10.0f;			// カメラ酔いを防ぐためにクリアしている
 		SetCameraAT(pos);
 		SetCamera();
-
+		DrawSky();
 		// 地面の描画処理
 		DrawMeshField();
 
@@ -428,6 +430,7 @@ char* GetDebugStr(void)
 void CheckHit(void)
 {
 	ENEMY  *enemy  = GetEnemy();	// エネミーのポインターを初期化
+	ENEMY  *enemyPart = GetEnemyParts();
 	PLAYER *player = GetPlayer();	// プレイヤーのポインターを初期化
 	KNIFE  *knife  = GetKnife();	// ナイフのポインターを初期化
 	
@@ -492,42 +495,42 @@ void CheckHit(void)
 			continue;
 
 		// 敵と当たってるか調べる
+
 		for (int j = 0; j < MAX_ENEMY; j++)
 		{
 			//敵の有効フラグをチェックする
-			if (enemy[j].use == false)
-				continue;
-			PrintDebugProc("Enemy:Hp:%f\n", enemy[i].hp);
 			XMFLOAT3* enemyVerts = new XMFLOAT3[enemy[j].points.VertexNum];
-			if (!enemyVerts == NULL) {
-				for (int p = 0; p < enemy[j].points.VertexNum; p++) {
-					enemyVerts[p] = AffineTransform(enemy[j].points.VertexArray[p], XMLoadFloat4x4(&enemy[j].mtxWorld));
+			if (enemy[j].use == false || enemyVerts == NULL)
+				continue;
+
+			UpdateHitbox(enemyVerts, enemy[j].points.VertexNum, enemy[j].points.VertexArray, 
+				enemy[j].pos, enemy[j].rot, enemy[j].scl, XMMatrixIdentity());
+
+			//GJKの当たり判定
+			if (GJKHit(knife[i].hitbox.list, knife[i].modelVertexPosition.VertexNum, enemyVerts, enemy[j].points.VertexNum))
+			{
+				XMMATRIX mtxWorld, mtxRot;
+				mtxWorld = XMMatrixIdentity();
+				mtxRot = XMMatrixRotationRollPitchYaw(-knife[i].rot.x, -knife[i].rot.y, -knife[i].rot.z);
+				mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
+				// 当たったから未使用に戻す
+				knife[i].state = hit;
+				knife[i].attachedTo = &enemy[j];
+				knife[i].parentRot = knife[i].attachedTo->rot;
+				XMVECTOR knifeInfo = XMLoadFloat3(&knife[i].pos);
+				XMVECTOR enemyInfo = XMLoadFloat3(&knife[i].attachedTo->pos);
+				knifeInfo -= enemyInfo;
+				XMStoreFloat3(&knife[i].pos,knifeInfo);
+				/*knife[i].pos = AffineTransform(knife[i].pos, mtxRot);*/
+				enemy[0].hp -= 10;
+				if (enemy[0].hp <= 0) {
+					enemy[0].use = false;
+					SetMode(MODE_RESULT);
 				}
-				//GJKの当たり判定
-				if (GJKHit(knife[i].hitbox.list, knife[i].modelVertexPosition.VertexNum, enemyVerts, enemy[j].points.VertexNum))
-				{
-					XMMATRIX mtxWorld, mtxRot;
-					mtxWorld = XMMatrixIdentity();
-					mtxRot = XMMatrixRotationRollPitchYaw(-knife[i].rot.x, -knife[i].rot.y, -knife[i].rot.z);
-					mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
-					// 当たったから未使用に戻す
-					knife[i].state = hit;
-					knife[i].attachedTo = &enemy[j];
-					knife[i].parentRot = knife[i].attachedTo->rot;
-					XMVECTOR knifeInfo = XMLoadFloat3(&knife[i].pos);
-					XMVECTOR enemyInfo = XMLoadFloat3(&knife[i].attachedTo->pos);
-					knifeInfo -= enemyInfo;
-					XMStoreFloat3(&knife[i].pos,knifeInfo);
-					/*knife[i].pos = AffineTransform(knife[i].pos, mtxRot);*/
-					enemy[0].hp -= 10;
-					if (enemy[0].hp <= 0) {
-						enemy[0].use = false;
-						SetMode(MODE_RESULT);
-					}
-					// スコアを足す
-					AddScore(10);
-				}
+				// スコアを足す
+				AddScore(10);
 			}
+		
 			delete[] enemyVerts;
 		}
 
@@ -564,7 +567,7 @@ void SetMode(int mode) {
 	//ゲーム画面の終了処理
 	// スコアの終了処理
 	UninitScore();
-
+	UninitSky();
 	// 弾の終了処理
 	UninitBullet();
 
@@ -628,7 +631,7 @@ void SetMode(int mode) {
 
 		// 影の初期化処理
 		InitShadow();
-
+		InitSky();
 		// プレイヤーの初期化
 		InitPlayer();
 
