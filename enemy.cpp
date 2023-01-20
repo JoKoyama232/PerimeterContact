@@ -158,6 +158,9 @@ void UpdateEnemy(void)
 		{	// 前へ移動
 			g_Enemy[i].pos.y -= 1.0f;
 		}
+		g_Enemy[i].pos.x = sinf(floating) * 50.0f;
+		g_Enemy[i].pos.z = cosf(floating) * 50.0f;
+		floating += 0.01f;
 		g_Enemy[i].rot.y += XM_PI * 0.01f;
 		// 影もプレイヤーの位置に合わせる
 		XMFLOAT3 pos = g_Enemy[i].pos;
