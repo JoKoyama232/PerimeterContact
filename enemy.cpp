@@ -56,7 +56,7 @@ HRESULT InitEnemy(void)
 		g_Enemy[i].hitbox.radius = 3.0f;
 		g_Enemy[i].rot = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		g_Enemy[i].scl = XMFLOAT3(1.0f, 1.0f, 1.0f);
-		g_Enemy[i].hp = 20;
+		g_Enemy[i].hp = 50;
 		g_Enemy[i].spd = 0.0f;			// 移動スピードクリア
 		g_Enemy[i].size = ENEMY_SIZE;	// 当たり判定の大きさ
 

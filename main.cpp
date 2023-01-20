@@ -462,11 +462,12 @@ void CheckHit(void)
 				}
 				PrintDebugProc("Enemyhit:X:%f Y:%f Z:%f\n", enemyCapsule.positiona.x, enemyCapsule.positiona.y, enemyCapsule.positiona.z);
 				PrintDebugProc("Enemyhit:X:%f Y:%f Z:%f\n", enemyCapsule.positionb.x, enemyCapsule.positionb.y, enemyCapsule.positionb.z);
-				PrintDebugProc("Enemy:vert:%d\n", enemy[0].points.VertexNum);
+				
 				//GJKHit(playerVerts, player->points.VertexNum, enemyVerts, enemy[i].points.VertexNum)
 				//BCの当たり判定
 				if (CapsuleCollision(playerCapsule,enemyCapsule))
 				{
+
 					// 敵キャラクターは倒される
 					/*enemy[i].use = false;*/
 					ReleaseShadow(enemy[i].shadowIdx);
@@ -496,6 +497,7 @@ void CheckHit(void)
 			//敵の有効フラグをチェックする
 			if (enemy[j].use == false)
 				continue;
+			PrintDebugProc("Enemy:Hp:%f\n", enemy[i].hp);
 			XMFLOAT3* enemyVerts = new XMFLOAT3[enemy[j].points.VertexNum];
 			if (!enemyVerts == NULL) {
 				for (int p = 0; p < enemy[j].points.VertexNum; p++) {
@@ -517,7 +519,11 @@ void CheckHit(void)
 					knifeInfo -= enemyInfo;
 					XMStoreFloat3(&knife[i].pos,knifeInfo);
 					/*knife[i].pos = AffineTransform(knife[i].pos, mtxRot);*/
-
+					enemy[0].hp -= 10;
+					if (enemy[0].hp <= 0) {
+						enemy[0].use = false;
+						SetMode(MODE_RESULT);
+					}
 					// スコアを足す
 					AddScore(10);
 				}
