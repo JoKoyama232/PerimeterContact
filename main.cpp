@@ -441,13 +441,10 @@ void CheckHit(void)
 	
 	if (!playerVerts == NULL) {
 
-
-		for (int p = 0; p < player->points.VertexNum; p++) {
-			playerVerts[p] = AffineTransform(player->points.VertexArray[p], XMLoadFloat4x4(&player->mtxWorld));
-		}
-		PrintDebugProc("Player:X:%f Y:%f Z:%f\n", playerCapsule.positiona.x, playerCapsule.positiona.y, playerCapsule.positiona.z);
-		PrintDebugProc("Player:X:%f Y:%f Z:%f\n", playerCapsule.positionb.x, playerCapsule.positionb.y, playerCapsule.positionb.z);
-		PrintDebugProc("Player:vert:%d\n", player->points.VertexNum);
+		AppliedTransform(playerVerts, player->points.VertexNum, player->points.VertexArray, XMLoadFloat4x4(&player->mtxWorld));
+		//PrintDebugProc("Player:X:%f Y:%f Z:%f\n", playerCapsule.positiona.x, playerCapsule.positiona.y, playerCapsule.positiona.z);
+		//PrintDebugProc("Player:X:%f Y:%f Z:%f\n", playerCapsule.positionb.x, playerCapsule.positionb.y, playerCapsule.positionb.z);
+		//PrintDebugProc("Player:vert:%d\n", player->points.VertexNum);
 		// 敵とプレイヤーキャラ
 		for (int i = 0; i < MAX_ENEMY; i++)
 		{
@@ -498,40 +495,57 @@ void CheckHit(void)
 
 		for (int j = 0; j < MAX_ENEMY; j++)
 		{
-			//敵の有効フラグをチェックする
-			XMFLOAT3* enemyVerts = new XMFLOAT3[enemy[j].points.VertexNum];
-			if (enemy[j].use == false || enemyVerts == NULL)
-				continue;
+			for (int k = 0; k < ENEMY_PARTS_MAX; k++) {
+				if (enemyPart[k].use == false
+					||knife[i].state == hit
+					|| !GJKHit(knife[i].hitbox.list, knife[i].modelVertexPosition.VertexNum, enemyPart[k].gjkList.list, enemyPart[k].points.VertexNum))
+					continue;
+				XMMATRIX mtxWorld = XMMatrixIdentity();
+				XMMATRIX mtxRot = XMMatrixRotationRollPitchYaw(knife[i].rot.x, knife[i].rot.y, knife[i].rot.z);
 
-			UpdateHitbox(enemyVerts, enemy[j].points.VertexNum, enemy[j].points.VertexArray, 
-				enemy[j].pos, enemy[j].rot, enemy[j].scl, XMMatrixIdentity());
-
-			//GJKの当たり判定
-			if (GJKHit(knife[i].hitbox.list, knife[i].modelVertexPosition.VertexNum, enemyVerts, enemy[j].points.VertexNum))
-			{
-				XMMATRIX mtxWorld, mtxRot;
-				mtxWorld = XMMatrixIdentity();
-				mtxRot = XMMatrixRotationRollPitchYaw(-knife[i].rot.x, -knife[i].rot.y, -knife[i].rot.z);
 				mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
-				// 当たったから未使用に戻す
+
+				// 当たったからナイフ状態更新
 				knife[i].state = hit;
-				knife[i].attachedTo = &enemy[j];
+				knife[i].attachedTo = &enemyPart[k];
 				knife[i].parentRot = knife[i].attachedTo->rot;
 				XMVECTOR knifeInfo = XMLoadFloat3(&knife[i].pos);
-				XMVECTOR enemyInfo = XMLoadFloat3(&knife[i].attachedTo->pos);
+				XMVECTOR enemyInfo = XMLoadFloat3(&AffineTransform( knife[i].attachedTo->pos, XMLoadFloat4x4(&enemyPart[k].attachedTo->mtxWorld)));
 				knifeInfo -= enemyInfo;
-				XMStoreFloat3(&knife[i].pos,knifeInfo);
-				/*knife[i].pos = AffineTransform(knife[i].pos, mtxRot);*/
-				enemy[0].hp -= 10;
-				if (enemy[0].hp <= 0) {
-					enemy[0].use = false;
-					SetMode(MODE_RESULT);
-				}
-				// スコアを足す
-				AddScore(10);
+				XMStoreFloat3(&knife[i].pos, knifeInfo);
+				break;
 			}
-		
-			delete[] enemyVerts;
+			//敵の有効フラグをチェックする
+			if (enemy[j].use == false
+				|| !GJKHit(knife[i].hitbox.list, knife[i].modelVertexPosition.VertexNum, enemy[j].gjkList.list, enemy[j].points.VertexNum))
+				continue;
+
+			//GJKの当たり判定
+
+			
+			XMMATRIX mtxWorld = XMMatrixIdentity();
+			XMMATRIX mtxRot = XMMatrixRotationRollPitchYaw(knife[i].rot.x, knife[i].rot.y, knife[i].rot.z);
+
+			mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
+
+			// 当たったからナイフ状態更新
+			knife[i].state = hit;
+			knife[i].attachedTo = &enemy[j];
+			knife[i].parentRot = knife[i].attachedTo->rot;
+			XMVECTOR knifeInfo = XMLoadFloat3(&knife[i].pos);
+			XMVECTOR enemyInfo = XMLoadFloat3(&knife[i].attachedTo->pos);
+			knifeInfo -= enemyInfo;
+			XMStoreFloat3(&knife[i].pos,knifeInfo);
+
+			//当たった時の処理
+			enemy[0].hp -= 10;
+			if (enemy[0].hp <= 0) {
+				enemy[0].use = false;
+				//SetMode(MODE_RESULT);
+			}
+			// スコアを足す
+			AddScore(10);
+
 		}
 
 	}

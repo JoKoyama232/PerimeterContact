@@ -59,6 +59,8 @@ HRESULT InitEnemy(void)
 		g_Enemy[i].hp = 50;
 		g_Enemy[i].spd = 0.0f;			// 移動スピードクリア
 		g_Enemy[i].size = ENEMY_SIZE;	// 当たり判定の大きさ
+		g_Enemy[i].gjkList.list =  new XMFLOAT3[g_Enemy[i].points.VertexNum];
+
 
 		// モデルのディフューズを保存しておく。色変え対応の為。
 		GetModelDiffuse(&g_Enemy[0].model, &g_Enemy[0].diffuse[0]);
@@ -109,6 +111,7 @@ HRESULT InitEnemy(void)
 			g_Parts[j].tbl_adr = NULL;		// 再生するアニメデータの先頭アドレスをセット
 			g_Parts[j].tbl_size = 0;		// 再生するアニメデータのレコード数をセット
 			g_Parts[j].use = true;			// true:生きてる
+			g_Parts[j].gjkList.list = new XMFLOAT3[g_Parts[j].points.VertexNum];
 			g_Parts[j].attachedTo = &g_Enemy[i];
 
 
@@ -129,6 +132,7 @@ void UninitEnemy(void)
 		{
 			UnloadModel(&g_Enemy[i].model);
 			g_Enemy[i].load = false;
+			delete[] g_Enemy[i].gjkList.list;
 			delete[] g_Enemy[i].points.VertexArray;
 		}
 		for (int j = 0; j < ENEMY_PARTS_MAX; j++) {
@@ -136,6 +140,7 @@ void UninitEnemy(void)
 			{
 				UnloadModel(&g_Parts[j].model);
 				g_Parts[j].load = false;
+				delete[] g_Parts[j].gjkList.list;
 				delete[] g_Parts[j].points.VertexArray;
 			}
 
@@ -154,10 +159,11 @@ void UpdateEnemy(void)
 	{
 		if (g_Enemy[i].use != true)	continue;		// このエネミーが使われている？
 													// Yes
-		if (GetKeyboardPress(DIK_P))
-		{	// 前へ移動
-			g_Enemy[i].pos.y -= 1.0f;
-		}
+		//if (GetKeyboardPress(DIK_P))
+		//{	// 前へ移動
+		//	g_Enemy[i].pos.y -= 1.0f;
+		//}
+
 		g_Enemy[i].pos.x = sinf(floating) * 50.0f;
 		g_Enemy[i].pos.z = cosf(floating) * 50.0f;
 		floating += 0.01f;
@@ -167,12 +173,19 @@ void UpdateEnemy(void)
 		pos.y -= (ENEMY_OFFSET_Y - 0.1f);
 		SetPositionShadow(g_Enemy[i].shadowIdx, pos);
 		PrintDebugProc("enemy:X:%f Y:%f Z:%f\n", g_Enemy[i].rot.x, g_Enemy[i].rot.y, g_Enemy[i].rot.z);
-		
+		UpdateHitbox(g_Enemy[i].gjkList.list, g_Enemy[i].points.VertexNum,
+			g_Enemy[i].points.VertexArray, g_Enemy[i].pos, g_Enemy[i].rot, g_Enemy[i].scl, XMMatrixIdentity());
+
 	}
 	
 	for (int i = 0; i < ENEMY_PARTS_MAX * MAX_ENEMY; i++)
 	{
-		XMFLOAT3 trackpos = AffineTransform(g_Parts[i].points.VertexArray[15], XMLoadFloat4x4(&g_Parts[i].mtxWorld));
+		if (!g_Parts[i].use)
+			continue;
+
+		UpdateHitbox(g_Parts[i].gjkList.list, g_Parts[i].points.VertexNum,
+			g_Parts[i].points.VertexArray, g_Parts[i].pos, g_Parts[i].rot, g_Parts[i].scl, XMLoadFloat4x4(&g_Parts[i].attachedTo->mtxWorld));
+			
 	}
 
 }

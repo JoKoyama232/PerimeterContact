@@ -89,7 +89,7 @@ void UpdateKnife(void)
 	{
 		if (g_Knife[i].state == hit){
 			UpdateHitbox(g_Knife[i].hitbox.list, g_Knife[i].modelVertexPosition.VertexNum,
-				g_Knife[i].modelVertexPosition.VertexArray, g_Knife[i].pos, g_Knife[i].rot, g_Knife[i].scl);
+				g_Knife[i].modelVertexPosition.VertexArray, g_Knife[i].pos, g_Knife[i].rot, g_Knife[i].scl,XMMatrixIdentity());
 			continue;
 		}
 			
@@ -118,7 +118,7 @@ void UpdateKnife(void)
 
 		// ヒットボックス
 		UpdateHitbox(g_Knife[i].hitbox.list, g_Knife[i].modelVertexPosition.VertexNum,
-			g_Knife[i].modelVertexPosition.VertexArray, g_Knife[i].pos, g_Knife[i].rot, g_Knife[i].scl);
+			g_Knife[i].modelVertexPosition.VertexArray, g_Knife[i].pos, g_Knife[i].rot, g_Knife[i].scl,XMMatrixIdentity());
 	}
 
 }

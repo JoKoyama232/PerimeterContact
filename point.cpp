@@ -175,7 +175,7 @@ void UpdatePoint(void)
 //=============================================================================
 void DrawPoint(void)
 {
-	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld, mtxView;
+	XMMATRIX mtxScl, mtxTranslate, mtxWorld, mtxView;
 	CAMERA* cam = GetCamera();
 
 	// ライティングを無効に

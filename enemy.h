@@ -30,6 +30,7 @@ struct ENEMY
 	DX11_MODEL			model;				// モデル情報
 	VERTEX_DATA			points;
 	CAPSULEHITBOX		hitbox;
+	HITBOX				gjkList;
 	XMFLOAT4			diffuse[MODEL_MAX_MATERIAL];	// モデルの色
 	float				hp;
 	float				spd;				// 移動スピード
