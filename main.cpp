@@ -495,50 +495,53 @@ void CheckHit(void)
 
 		for (int j = 0; j < MAX_ENEMY; j++)
 		{
-			for (int k = 0; k < ENEMY_PARTS_MAX; k++) {
-				if (enemyPart[k].use == false
-					||knife[i].state == hit
-					|| !GJKHit(knife[i].hitbox.list, knife[i].modelVertexPosition.VertexNum, enemyPart[k].gjkList.list, enemyPart[k].points.VertexNum))
-					continue;
-				XMMATRIX mtxWorld = XMMatrixIdentity();
-				XMMATRIX mtxRot = XMMatrixRotationRollPitchYaw(knife[i].rot.x, knife[i].rot.y, knife[i].rot.z);
+			//for (int k = 0; k < ENEMY_PARTS_MAX; k++) {
+			//	if (enemyPart[k].use == false
+			//		||knife[i].state == hit
+			//		|| !GJKHit(knife[i].hitbox.list, knife[i].modelVertexPosition.VertexNum, enemyPart[k].gjkList.list, enemyPart[k].points.VertexNum))
+			//		continue;
+			//	XMMATRIX mtxWorld = XMMatrixIdentity();
+			//	XMMATRIX mtxRot = XMMatrixRotationRollPitchYaw(knife[i].rot.x, knife[i].rot.y, knife[i].rot.z);
 
-				mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
+			//	mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
 
-				// 当たったからナイフ状態更新
-				knife[i].state = hit;
-				knife[i].attachedTo = &enemyPart[k];
-				knife[i].parentRot = knife[i].attachedTo->rot;
-				XMVECTOR knifeInfo = XMLoadFloat3(&knife[i].pos);
-				XMVECTOR enemyInfo = XMLoadFloat3(&AffineTransform( knife[i].attachedTo->pos, XMLoadFloat4x4(&enemyPart[k].attachedTo->mtxWorld)));
-				knifeInfo -= enemyInfo;
-				XMStoreFloat3(&knife[i].pos, knifeInfo);
-				break;
-			}
+			//	// 当たったからナイフ状態更新
+			//	knife[i].state = hit;
+			//	knife[i].attachedTo = &enemyPart[k];
+			//	knife[i].parentRot = knife[i].attachedTo->rot;
+			//	XMVECTOR knifeInfo = XMLoadFloat3(&knife[i].pos);
+			//	XMVECTOR enemyInfo = XMLoadFloat3(&knife[i].attachedTo->pos);
+			//	XMFLOAT3 position;
+			//	knifeInfo -= enemyInfo;
+			//	XMStoreFloat3(&position, knifeInfo);
+
+			//	 mtxWorld = XMMatrixTranspose(XMLoadFloat4x4(&enemyPart[k].mtxWorld));
+			//	AffineTransform(position, mtxWorld);
+			//	knife[i].pos = position;
+			//	break;
+			//}
 			//敵の有効フラグをチェックする
 			if (enemy[j].use == false
 				|| !GJKHit(knife[i].hitbox.list, knife[i].modelVertexPosition.VertexNum, enemy[j].gjkList.list, enemy[j].points.VertexNum))
 				continue;
 
 			//GJKの当たり判定
-
-			
-			XMMATRIX mtxWorld = XMMatrixIdentity();
-			XMMATRIX mtxRot = XMMatrixRotationRollPitchYaw(knife[i].rot.x, knife[i].rot.y, knife[i].rot.z);
-
-			mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
-
 			// 当たったからナイフ状態更新
 			knife[i].state = hit;
 			knife[i].attachedTo = &enemy[j];
 			knife[i].parentRot = knife[i].attachedTo->rot;
 			XMVECTOR knifeInfo = XMLoadFloat3(&knife[i].pos);
 			XMVECTOR enemyInfo = XMLoadFloat3(&knife[i].attachedTo->pos);
+			XMFLOAT3 position;
 			knifeInfo -= enemyInfo;
-			XMStoreFloat3(&knife[i].pos,knifeInfo);
+			XMStoreFloat3(&position, knifeInfo);
+			
+			XMMATRIX mtxWorld = XMMatrixTranspose(XMLoadFloat4x4(&enemy[j].mtxWorld));
+			AffineTransform(position, mtxWorld );
+			knife[i].pos = position;
 
 			//当たった時の処理
-			enemy[0].hp -= 10;
+			//enemy[0].hp -= 10;
 			if (enemy[0].hp <= 0) {
 				enemy[0].use = false;
 				//SetMode(MODE_RESULT);
