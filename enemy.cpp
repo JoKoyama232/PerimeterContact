@@ -19,14 +19,14 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	MODEL_ENEMY			"data/MODEL/player.obj"		// 読み込むモデル名
+#define	MODEL_ENEMY			"data/MODEL/enemy.obj"		// 読み込むモデル名
 #define	MODEL_ENEMY_PARTS	"data/MODEL/tracks.obj"
 
 #define	VALUE_MOVE			(5.0f)						// 移動量
 #define	VALUE_ROTATE		(XM_PI * 0.02f)				// 回転量
 
 #define ENEMY_SHADOW_SIZE	(0.4f)						// 影の大きさ
-#define ENEMY_OFFSET_Y		(40.0f)						// エネミーの足元をあわせる
+#define ENEMY_OFFSET_Y		(70.0f)						// エネミーの足元をあわせる
 
 
 //*****************************************************************************
@@ -61,7 +61,7 @@ HRESULT InitEnemy(void)
 		g_Enemy[i].hitbox.positionb = { 0.0f,2* ENEMY_OFFSET_Y-3.0f, 0.0f };
 		g_Enemy[i].hitbox.radius = 3.0f;
 		g_Enemy[i].rot = XMFLOAT3(0.0f, 0.0f, 0.0f);
-		g_Enemy[i].scl = XMFLOAT3(1.0f, 1.0f, 1.0f);
+		g_Enemy[i].scl = XMFLOAT3(1.5f, 1.5f, 1.5f);
 		g_Enemy[i].hp = 50;
 		g_Enemy[i].spd = 0.0f;			// 移動スピードクリア
 		g_Enemy[i].size = ENEMY_SIZE;	// 当たり判定の大きさ
@@ -70,10 +70,6 @@ HRESULT InitEnemy(void)
 
 		// モデルのディフューズを保存しておく。色変え対応の為。
 		GetModelDiffuse(&g_Enemy[0].model, &g_Enemy[0].diffuse[0]);
-
-		XMFLOAT3 pos = g_Enemy[i].pos;
-		pos.y -= (ENEMY_OFFSET_Y - 0.1f);
-		g_Enemy[i].shadowIdx = CreateShadow(pos, ENEMY_SHADOW_SIZE, ENEMY_SHADOW_SIZE);
 
 		g_Enemy[i].move_time = 0.0f;	// 線形補間用のタイマーをクリア
 		g_Enemy[i].tbl_adr = NULL;		// 再生するアニメデータの先頭アドレスをセット
@@ -91,26 +87,26 @@ HRESULT InitEnemy(void)
 			switch (j) {
 			case 0:
 				//Front Right
-				g_Parts[j].pos = XMFLOAT3(30.0f, 0.0f, -5.0f);
+				g_Parts[j].pos = XMFLOAT3(20.0f, -20.0f, -5.0f);
 				g_Parts[j].rot = XMFLOAT3(XM_PI / 5, 0.0f, 0.0f);
 				break;
 			case 1:
 				//Front Left
-				g_Parts[j].pos = XMFLOAT3(-30.0f, 0.0f, -5.0f);
+				g_Parts[j].pos = XMFLOAT3(-20.0f, -20.0f, -5.0f);
 				g_Parts[j].rot = XMFLOAT3(XM_PI / 5, 0.0f, 0.0f);
 				break;
 			case 2:
 				//Back Right
-				g_Parts[j].pos = XMFLOAT3(30.0f, 0.0f, 0.0f);
+				g_Parts[j].pos = XMFLOAT3(20.0f, -20.0f, 0.0f);
 				g_Parts[j].rot = XMFLOAT3(XM_PI / 5, XM_PI, 0.0f);
 				break;
 			case 3:
 				//Back Left
-				g_Parts[j].pos = XMFLOAT3(-30.0f, 0.0f, 0.0f);
+				g_Parts[j].pos = XMFLOAT3(-20.0f, -20.0f, 0.0f);
 				g_Parts[j].rot = XMFLOAT3(XM_PI / 5, XM_PI, 0.0f);
 				break;
 			}
-			g_Parts[j].scl = XMFLOAT3(2.0f, 2.0f, 2.0f);
+			g_Parts[j].scl = XMFLOAT3(1.5f, 1.5f, 1.5f);
 			g_Parts[j].spd = 0.0f;
 			g_Parts[j].size = ENEMY_SIZE;
 			g_Parts[j].move_time = 0.0f;	// 線形補間用のタイマーをクリア
@@ -188,9 +184,15 @@ void UpdateEnemy(void)
 	{
 		if (!g_Parts[i].use)
 			continue;
-
 		UpdateHitbox(g_Parts[i].gjkList.list, g_Parts[i].points.VertexNum,
 			g_Parts[i].points.VertexArray, g_Parts[i].pos, g_Parts[i].rot, g_Parts[i].scl, XMLoadFloat4x4(&g_Parts[i].attachedTo->mtxWorld));
+
+		XMVECTOR rot = XMVector3Normalize(XMLoadFloat3(&g_Parts[i].rot));
+		XMVECTOR pos = FindFurthestPointFrom(rot, g_Parts[i].gjkList.list, g_Parts[i].points.VertexNum);
+		XMFLOAT3 posf3;
+		XMStoreFloat3(&posf3, pos);
+		XMFLOAT3 hitPos, hitNorm;
+		RayHitField(posf3,&hitPos,&hitNorm);
 			
 	}
 

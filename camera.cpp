@@ -5,9 +5,12 @@
 //
 //=============================================================================
 #include "main.h"
+#include "collision.h"
+#include "meshfield.h"
 #include "input.h"
 #include "camera.h"
 #include "debugproc.h"
+
 
 //*****************************************************************************
 // マクロ定義
@@ -109,6 +112,16 @@ void UpdateCamera(void)
 	else if (mousey > 0.0f)
 	{// 注視点移動「上」
 		g_Camera.pos.y += mousey * 0.1f;
+	}
+	if (GetMode() == MODE_GAME) {
+		// レイキャストして足元の高さを求める
+		XMFLOAT3 HitPosition;		// 交点
+		XMFLOAT3 Normal;			// ぶつかったポリゴンの法線ベクトル（向き）
+		bool ans = RayHitField(g_Camera.pos, &HitPosition, &Normal);
+		if (ans && g_Camera.pos.y < HitPosition.y + 10.0f)
+		{
+			g_Camera.pos.y = HitPosition.y + 10.0f;
+		}
 	}
 
 	if (GetKeyboardPress(DIK_Y))

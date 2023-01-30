@@ -74,7 +74,7 @@ HRESULT InitBullet(void)
 
 		g_Bullet[nCntBullet].pos = { 0.0f, 0.0f, 0.0f };
 		g_Bullet[nCntBullet].rot = { 0.0f, 0.0f, 0.0f };
-		g_Bullet[nCntBullet].scl = { 1.0f, 1.0f, 1.0f };
+		g_Bullet[nCntBullet].targetPos = { 1.0f, 1.0f, 1.0f };
 		g_Bullet[nCntBullet].fWidth = BULLET_WIDTH;
 		g_Bullet[nCntBullet].fHeight = BULLET_HEIGHT;
 		g_Bullet[nCntBullet].use = false;
@@ -116,10 +116,16 @@ void UpdateBullet(void)
 	{
 		if (g_Bullet[i].use)
 		{
-			
-			g_Bullet[i].pos = GetBezier(g_Bullet[i].startPos, g_Bullet[i].middlePos, g_Bullet[i].target, g_Bullet[i].progress);
+			DWORD deltaTimeMs = timeGetTime() - g_Bullet[i].timer;
+			g_Bullet[i].timer = timeGetTime();
+			if (g_Bullet[i].progress < 0.9f) {
+				g_Bullet[i].targetPos = { g_Bullet[i].target->x, g_Bullet[i].target->y, g_Bullet[i].target->z };
+			}
+
+			g_Bullet[i].pos = GetBezier(g_Bullet[i].startPos, g_Bullet[i].middlePos, g_Bullet[i].targetPos, g_Bullet[i].progress);
+
 			if(g_Bullet[i].progress > 0.5f)g_Bullet[i].pos.y += BULLET_WIDTH * 0.5f*sinf(g_Bullet[i].progress * 8 *XM_PI);
-			g_Bullet[i].progress += 0.01f;
+			g_Bullet[i].progress +=  0.001f;
 
 			if (g_Bullet[i].progress > 1.0f) 
 			{ 
@@ -169,10 +175,6 @@ void DrawBullet(void)
 		{
 			// ワールドマトリックスの初期化
 			mtxWorld = XMMatrixIdentity();
-
-			// スケールを反映
-			mtxScl = XMMatrixScaling(g_Bullet[i].scl.x, g_Bullet[i].scl.y, g_Bullet[i].scl.z);
-			mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
 
 			// 回転を反映
 			mtxRot = XMMatrixRotationRollPitchYaw(g_Bullet[i].rot.x, g_Bullet[i].rot.y + XM_PI, g_Bullet[i].rot.z);
@@ -254,7 +256,7 @@ HRESULT MakeVertexBullet(void)
 //=============================================================================
 // 弾のパラメータをセット
 //=============================================================================
-int SetBullet(XMFLOAT3 initialPos,XMFLOAT3 middlePos, XMFLOAT3 targetPos)
+int SetBullet(XMFLOAT3 initialPos, XMFLOAT3 *targetPos,float speed)
 {
 	int nIdxBullet = -1;
 
@@ -264,15 +266,16 @@ int SetBullet(XMFLOAT3 initialPos,XMFLOAT3 middlePos, XMFLOAT3 targetPos)
 		{
 			g_Bullet[nCntBullet].startPos = initialPos;
 			g_Bullet[nCntBullet].target = targetPos;
+			g_Bullet[nCntBullet].timer = timeGetTime();
 			XMVECTOR base = XMLoadFloat3(&initialPos);
-			XMFLOAT3 direction = { (targetPos.x - initialPos.x),0.0f,(targetPos.x - initialPos.x) };
+			XMFLOAT3 direction = { (g_Bullet[nCntBullet].target->x - initialPos.x),0.0f,(g_Bullet[nCntBullet].target->y- initialPos.x) };
 			XMVECTOR normalDirectionVector = XMVector3Normalize( XMLoadFloat3(&direction));
 			XMVECTOR up = { (0.0f,1.0f,0.0f) };
 			XMVECTOR side;
 			crossProduct(&side, &normalDirectionVector, &up);
-			XMVECTOR middlePoint = base - 10 * normalDirectionVector + (rand() % 10 - 5) * side;
+			XMVECTOR middlePoint = base - 200 * normalDirectionVector + (rand() % 10 - 5) * side;
 			XMStoreFloat3(&g_Bullet[nCntBullet].middlePos, middlePoint);
-			
+			g_Bullet[nCntBullet].middlePos.y = g_Bullet[nCntBullet].target->y + 100.0f;
 			g_Bullet[nCntBullet].progress = 0.0f;
 			g_Bullet[nCntBullet].use = true;
 

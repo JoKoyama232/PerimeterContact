@@ -6,7 +6,7 @@
 //=============================================================================
 #include "title.h"
 #include "input.h"
-
+#include "fade.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -55,7 +55,7 @@ SPRITE	sprite[TEXTURE_MAX];
 float	alpha;
 BOOL	flag_alpha;
 DWORD	timer;
-int		selector
+int		selector=0;
 static BOOL						g_Load = FALSE;
 
 static float	effect_dx;
@@ -107,9 +107,11 @@ HRESULT InitTitle(void)
 
 	sprite[startButton].pos = { g_w / 2, 300.0f };
 	sprite[startButton].size = { 164.0f, 36.0f };
+	sprite[startButton].color.w = 0.75f;
 
 	sprite[quitButton].pos = { g_w / 2, 400.0f };
 	sprite[quitButton].size = { 164.0f, 36.0f };
+	sprite[quitButton].color.w = 0.75f;
 
 	sprite[introBackground].pos = { g_w / 2, g_h / 2 };
 	sprite[introBackground].size = { (float)TEXTURE_WIDTH, (float)TEXTURE_HEIGHT };
@@ -166,15 +168,29 @@ void UpdateTitle(void)
 	DWORD time = timeGetTime() - timer;
 	if (GetKeyboardTrigger(DIK_RETURN))
 	{// Enter押したら、ステージを切り替える
-		if (IsFirstLoad)
-			time += 7000;
+		if (IsFirstLoad())
+		{
+			sprite[background].use = true;
+			sprite[title].use = true;
+			sprite[startButton].use = true;
+			sprite[quitButton].use = true;
+			time = 8001;
+		}
+
 		else 
 		{
-			//switch
+			switch (selector) {
+			case 0:
+				SetMode(MODE_GAME);
+				break;
+			case 1:
+				exit(-1);
+				break;
+			}
 		}
 	}
+
 	if (IsFirstLoad()) {
-		DWORD time = timeGetTime() - timer;
 		if (time > 8000) 
 		{
 			
@@ -208,8 +224,25 @@ void UpdateTitle(void)
 		}
 		
 	}
+	if (GetKeyboardTrigger(DIK_W)) 
+	{
+		selector--;
+		selector %= 2;
+	}
+	else if (GetKeyboardTrigger(DIK_S)) 
+	{
+		selector++;
+		selector %= 2;
+	}
 
-
+	if (selector == 0) {
+		sprite[startButton].useColor = false;
+		sprite[quitButton].useColor	 = true;
+	}
+	else {
+		sprite[startButton].useColor = true;
+		sprite[quitButton].useColor  = false;
+	}
 }
 
 //=============================================================================

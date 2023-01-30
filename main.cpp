@@ -390,6 +390,7 @@ void Draw(void)
 
 	}
 	//SetViewPort(TYPE_RIGHT_HALF_SCREEN);
+	DrawFade();
 
 
 

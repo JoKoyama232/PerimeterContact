@@ -23,7 +23,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	MODEL_PLAYER		"data/MODEL/enemy.obj"			// 読み込むモデル名
+#define	MODEL_PLAYER		"data/MODEL/player.obj"			// 読み込むモデル名
 #define	MODEL_PLAYER_HAND	"data/MODEL/hand.obj"			// 読み込むモデル名
 #define	MODEL_PLAYER_HEAD	"data/MODEL/head.obj"			// 読み込むモデル名
 #define	MODEL_PLAYER_PARTS	"data/MODEL/funnel_s.obj"			// 読み込むモデル名
@@ -221,6 +221,7 @@ void UpdatePlayer(void)
 {
 	CAMERA *cam = GetCamera();
 	DWORD cdTimer = timeGetTime();
+	ENEMY *enemy = GetEnemy();
 	if (g_Player.tblNo == -1) {
 		// 移動させちゃう
 		if (GetKeyboardPress(DIK_A))
@@ -250,12 +251,13 @@ void UpdatePlayer(void)
 		if (GetKeyboardTrigger(DIK_SPACE) && cdTimer - dashcd > 3000)
 		{
 			//DASH
-			g_Player.tblNo = 1;
-			g_Player.time = 0.5f;
-			dashcd = cdTimer;
-			dashTbl[0] = g_Player.pos;
-			dashTbl[1] = XMFLOAT3(g_Player.pos.x - sinf(g_Player.rot.y) * VALUE_MOVE * 60,
-				g_Player.pos.y, g_Player.pos.z - cosf(g_Player.rot.y) * VALUE_MOVE * 60);
+			//g_Player.tblNo = 1;
+			//g_Player.time = 0.5f;
+			//dashcd = cdTimer;
+			//dashTbl[0] = g_Player.pos;
+			//dashTbl[1] = XMFLOAT3(g_Player.pos.x - sinf(g_Player.rot.y) * VALUE_MOVE * 60,
+			//	g_Player.pos.y, g_Player.pos.z - cosf(g_Player.rot.y) * VALUE_MOVE * 60);
+			SetBullet(g_Player.pos, &enemy[0].pos, 0.1f);
 		}
 		if (IsMouseRightPressed() == FALSE) {
 			camRotY = cam->rot.y;

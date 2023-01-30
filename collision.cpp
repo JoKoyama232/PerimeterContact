@@ -236,6 +236,7 @@ XMVECTOR ClosestPointOnLineAB(XMVECTOR a, XMVECTOR b, XMVECTOR p) {
 
 
 
+
 bool SphereTriCollision(float radius, XMFLOAT3 sphereCenter, XMFLOAT3 triPoint0, XMFLOAT3 triPoint1, XMFLOAT3 triPoint2)
 {
 	XMVECTOR	triPointa = XMLoadFloat3(&triPoint0);

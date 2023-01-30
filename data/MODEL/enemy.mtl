@@ -1,13 +1,18 @@
-# 
-# Wavefront material file
-# Created with Kaydara FBX
-# 
-
-newmtl unnamed
-Ka 0.500000 0.500000 0.500000
-Kd 1.000000 1.000000 1.000000
-Ks 0.160000 0.160000 0.160000
-illum 2
-Ns 80.000000
-Tr 1.000000
-map_Kd enemy.png
+newmtl lambert2SG
+illum 4
+Kd 0.00 0.53 0.62
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+newmtl lambert3SG
+illum 4
+Kd 1.00 0.56 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+newmtl lambert4SG
+illum 4
+Kd 0.93 0.06 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
