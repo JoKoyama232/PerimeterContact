@@ -111,6 +111,9 @@
     <ClInclude Include="skydome.h">
       <Filter>ヘッダー ファイル\ゲームオブジェクト</Filter>
     </ClInclude>
+    <ClInclude Include="fade.h">
+      <Filter>ヘッダー ファイル\描画オブジェクト</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="collision.cpp">
@@ -176,9 +179,6 @@
     <ClCompile Include="camera.cpp">
       <Filter>ソース ファイル\ゲームオブジェクト</Filter>
     </ClCompile>
-    <ClCompile Include="tutorial.cpp">
-      <Filter>ソース ファイル\UI</Filter>
-    </ClCompile>
     <ClCompile Include="title.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
@@ -190,6 +190,12 @@
     </ClCompile>
     <ClCompile Include="skydome.cpp">
       <Filter>ソース ファイル\ゲームオブジェクト</Filter>
+    </ClCompile>
+    <ClCompile Include="fade.cpp">
+      <Filter>ソース ファイル\描画オブジェクト</Filter>
+    </ClCompile>
+    <ClCompile Include="tutorial.cpp">
+      <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -28,6 +28,7 @@
 #include "point.h"
 #include "knife.h"
 #include "skydome.h"
+#include "fade.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -52,7 +53,7 @@ void CheckHit(void);
 //*****************************************************************************
 long g_MouseX = 0;
 long g_MouseY = 0;
-
+bool firstLoad = true;
 tagRECT window;
 
 
@@ -62,7 +63,7 @@ char	g_DebugStr[2048] = WINDOW_NAME;		// デバッグ文字表示用
 
 #endif
 
-int	g_Mode = MODE_GAME;					// 起動時の画面を設定
+int	g_Mode = MODE_TITLE;					// 起動時の画面を設定
 
 
 //=============================================================================
@@ -239,7 +240,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	// 入力処理の初期化
 	InitInput(hInstance, hWnd);
 	//-----
-	
+	InitFade();
 
 	//PlaySound(SOUND_LABEL_BGM_sample001);
 
@@ -261,7 +262,7 @@ void Uninit(void)
 {
 	UninitSound();
 
-	
+	UninitFade();
 	// カメラの終了処理
 	UninitCamera();
 
@@ -328,6 +329,7 @@ void Update(void)
 	// カメラ更新
 	UpdateCamera();
 
+	UpdateFade();
 	
 
 }
@@ -625,7 +627,7 @@ void SetMode(int mode) {
 	case MODE_GAME:
 		// フィールドの初期化
 		InitMeshField(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 20, 20, 100.0f, 100.0f);
-
+		firstLoad = false;
 		//// 壁の初期化
 		//InitMeshWall(XMFLOAT3(0.0f, 0.0f, MAP_TOP), XMFLOAT3(0.0f, 0.0f, 0.0f),
 		//	XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
@@ -679,3 +681,12 @@ void SetMode(int mode) {
 int	GetMode(void) {
 	return g_Mode;
 }
+
+bool IsFirstLoad(void) {
+	return firstLoad;
+}
+
+void setLoad(bool update) {
+	firstLoad = update;
+}
+

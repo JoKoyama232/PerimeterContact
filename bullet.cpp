@@ -8,6 +8,7 @@
 #include "renderer.h"
 #include "shadow.h"
 #include "bullet.h"
+#include "collision.h"
 
 
 //*****************************************************************************
@@ -263,7 +264,15 @@ int SetBullet(XMFLOAT3 initialPos,XMFLOAT3 middlePos, XMFLOAT3 targetPos)
 		{
 			g_Bullet[nCntBullet].startPos = initialPos;
 			g_Bullet[nCntBullet].target = targetPos;
-			g_Bullet[nCntBullet].middlePos = middlePos;
+			XMVECTOR base = XMLoadFloat3(&initialPos);
+			XMFLOAT3 direction = { (targetPos.x - initialPos.x),0.0f,(targetPos.x - initialPos.x) };
+			XMVECTOR normalDirectionVector = XMVector3Normalize( XMLoadFloat3(&direction));
+			XMVECTOR up = { (0.0f,1.0f,0.0f) };
+			XMVECTOR side;
+			crossProduct(&side, &normalDirectionVector, &up);
+			XMVECTOR middlePoint = base - 10 * normalDirectionVector + (rand() % 10 - 5) * side;
+			XMStoreFloat3(&g_Bullet[nCntBullet].middlePos, middlePoint);
+			
 			g_Bullet[nCntBullet].progress = 0.0f;
 			g_Bullet[nCntBullet].use = true;
 

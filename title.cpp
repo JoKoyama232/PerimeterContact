@@ -1,7 +1,7 @@
 //=============================================================================
 //
 // ƒ^ƒCƒgƒ‹‰æ–Êˆ— [title.cpp]
-// Author : 
+// Author : ¬R@é
 //
 //=============================================================================
 #include "title.h"
@@ -13,15 +13,21 @@
 //*****************************************************************************
 #define TEXTURE_WIDTH				(SCREEN_WIDTH)	// ”wŒiƒTƒCƒY
 #define TEXTURE_HEIGHT				(SCREEN_HEIGHT)	// 
-#define TEXTURE_MAX					(3)				// ƒeƒNƒXƒ`ƒƒ‚Ì”
-
-#define TEXTURE_WIDTH_LOGO			(480)			// ƒƒSƒTƒCƒY
-#define TEXTURE_HEIGHT_LOGO			(80)			// 
+#define TEXTURE_MAX					(7)				// ƒeƒNƒXƒ`ƒƒ‚Ì”
 
 //*****************************************************************************
 // ƒvƒƒgƒ^ƒCƒvéŒ¾
 //*****************************************************************************
-
+enum titleTexture 
+{
+	background = 0,
+	title,
+	startButton,
+	quitButton,
+	introBackground,
+	logo,
+	credit
+};
 
 //*****************************************************************************
 // ƒOƒ[ƒoƒ‹•Ï”
@@ -32,7 +38,12 @@ static ID3D11ShaderResourceView* g_Texture[TEXTURE_MAX] = { NULL };	// ƒeƒNƒXƒ`ƒ
 static char* g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/sunrise.jpg",
 	"data/TEXTURE/title.png",
-	"data/TEXTURE/effect000.jpg",
+	"data/TEXTURE/start.png",
+	"data/TEXTURE/QuitLogo.png",
+	"data/TEXTURE/fade_black.png",
+	"data/TEXTURE/Logo.png",
+	"data/TEXTURE/myName.png",
+	
 };
 
 
@@ -40,10 +51,11 @@ static BOOL						g_Use;						// TRUE:g‚Á‚Ä‚¢‚é  FALSE:–¢g—p
 static float					g_w, g_h;					// •‚Æ‚‚³
 static XMFLOAT3					g_Pos;						// ƒ|ƒŠƒSƒ“‚ÌÀ•W
 static int						g_TexNo;					// ƒeƒNƒXƒ`ƒƒ”Ô†
-
+SPRITE	sprite[TEXTURE_MAX];
 float	alpha;
 BOOL	flag_alpha;
-
+DWORD	timer;
+int		selector
 static BOOL						g_Load = FALSE;
 
 static float	effect_dx;
@@ -67,6 +79,12 @@ HRESULT InitTitle(void)
 			NULL,
 			&g_Texture[i],
 			NULL);
+
+		sprite[i].pos = XMFLOAT2(0.0f, 0.0f);
+		sprite[i].size = XMFLOAT2(0.0f, 0.0f);
+		sprite[i].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		sprite[i].use = false;
+		sprite[i].useColor = false;
 	}
 
 
@@ -79,20 +97,38 @@ HRESULT InitTitle(void)
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	GetDevice()->CreateBuffer(&bd, NULL, &g_VertexBuffer);
 
+	g_w = SCREEN_WIDTH;
+	g_h = SCREEN_HEIGHT;
+	sprite[background].pos = { g_w / 2, g_h / 2 };
+	sprite[background].size = { (float)TEXTURE_WIDTH, (float)TEXTURE_HEIGHT };
 
-	// •Ï”‚Ì‰Šú‰»
-	g_Use = TRUE;
-	g_w = TEXTURE_WIDTH;
-	g_h = TEXTURE_HEIGHT;
-	g_Pos = XMFLOAT3(g_w / 2, g_h / 2, 0.0f);
-	g_TexNo = 0;
+	sprite[title].pos = { g_w / 2, 100.0f };
+	sprite[title].size = { 500.0f, 180.0f };
 
-	alpha = 1.0f;
-	flag_alpha = TRUE;
+	sprite[startButton].pos = { g_w / 2, 300.0f };
+	sprite[startButton].size = { 164.0f, 36.0f };
 
-	effect_dx = 100.0f;
-	effect_dy = 100.0f;
+	sprite[quitButton].pos = { g_w / 2, 400.0f };
+	sprite[quitButton].size = { 164.0f, 36.0f };
 
+	sprite[introBackground].pos = { g_w / 2, g_h / 2 };
+	sprite[introBackground].size = { (float)TEXTURE_WIDTH, (float)TEXTURE_HEIGHT };
+	sprite[introBackground].useColor = true;
+	sprite[introBackground].use = true;
+
+	sprite[logo].pos = { 530.0f, g_h / 2 };
+	sprite[logo].size = { 486.0f, 168.0f };
+	sprite[logo].useColor = true;
+	sprite[logo].color.w = 0.0f;
+	sprite[logo].use = true;
+
+	sprite[credit].pos = { g_w / 2, 520.0f };
+	sprite[credit].size = { 210, 10 };
+	sprite[credit].useColor = true;
+	sprite[credit].color.w = 0.0f;
+	sprite[credit].use = true;
+
+	timer = timeGetTime();
 	g_Load = TRUE;
 	return S_OK;
 }
@@ -127,56 +163,52 @@ void UninitTitle(void)
 //=============================================================================
 void UpdateTitle(void)
 {
-
+	DWORD time = timeGetTime() - timer;
 	if (GetKeyboardTrigger(DIK_RETURN))
 	{// Enter‰Ÿ‚µ‚½‚çAƒXƒe[ƒW‚ğØ‚è‘Ö‚¦‚é
-		SetMode(MODE_TUTORIAL);
+		if (IsFirstLoad)
+			time += 7000;
+		else 
+		{
+			//switch
+		}
 	}
-	// ƒQ[ƒ€ƒpƒbƒh‚Å“ü—Íˆ—
-	else if (IsButtonTriggered(0, BUTTON_START))
-	{
-		SetMode(MODE_TUTORIAL);
-	}
-	else if (IsButtonTriggered(0, BUTTON_B))
-	{
-		SetMode(MODE_TUTORIAL);
-	}
+	if (IsFirstLoad()) {
+		DWORD time = timeGetTime() - timer;
+		if (time > 8000) 
+		{
+			
 
-
-
-	// ƒZ[ƒuƒf[ƒ^‚ğƒ[ƒh‚·‚éH
-	//if (GetKeyboardTrigger(DIK_L))
-	//{
-	//	SetMode(MODE_GAME);
-	//}
-
-
-	// ƒeƒXƒg‚ÅƒGƒtƒFƒNƒg‚Ì”­¶êŠ‚ğˆÚ“®‚³‚¹‚é
-	float speed = 4.0f;
-
-	if (GetKeyboardPress(DIK_DOWN))
-	{
-		effect_dy += speed;
-	}
-	else if (GetKeyboardPress(DIK_UP))
-	{
-		effect_dy -= speed;
-	}
-
-	if (GetKeyboardPress(DIK_RIGHT))
-	{
-		effect_dx += speed;
-	}
-	else if (GetKeyboardPress(DIK_LEFT))
-	{
-		effect_dx -= speed;
+			sprite[logo].use = false;
+			sprite[credit].use = false;
+			sprite[introBackground].use = false;
+			setLoad(false);
+		}
+		else if (time > 7000)
+		{
+			if(!sprite[background].use)
+			{
+				sprite[background].use = true;
+				sprite[title].use = true;
+				sprite[startButton].use = true;
+				sprite[quitButton].use = true;
+			}
+			sprite[logo].color.w = 1 - (time - 7000) / 1000.0f;
+			sprite[credit].color.w = 1 - (time - 7000) / 1000.0f;
+			sprite[introBackground].color.w = 1 - (time - 7000) / 1000.0f;
+		}
+		
+		else if (time > 3000)
+		{
+			sprite[credit].color.w = (time - 3000) / 1000.0f;
+		}
+		else if (time > 1000)
+		{
+			sprite[logo].color.w = (time - 1000) / 2000.0f;
+		}
+		
 	}
 
-
-#ifdef _DEBUG	// ƒfƒoƒbƒOî•ñ‚ğ•\¦‚·‚é
-	//PrintDebugProc("Player:ª ¨ « ©@Space\n");
-
-#endif
 
 }
 
@@ -209,25 +241,19 @@ void DrawTitle(void)
 	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	SetMaterial(material);
 
-	// ƒ^ƒCƒgƒ‹‚Ì”wŒi‚ğ•`‰æ
+	for(int i =0;i< TEXTURE_MAX;i++)
 	{
-		// ƒeƒNƒXƒ`ƒƒİ’è
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[0]);
+		if (!sprite[i].use)
+			continue;
 
-		// ‚P–‡‚Ìƒ|ƒŠƒSƒ“‚Ì’¸“_‚ÆƒeƒNƒXƒ`ƒƒÀ•W‚ğİ’è
-		SetSpriteLeftTop(g_VertexBuffer, 0.0f, 0.0f, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0.0f, 0.0f, 1.0f, 1.0f);
+		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[i]);
 
-		// ƒ|ƒŠƒSƒ“•`‰æ
-		GetDeviceContext()->Draw(4, 0);
-	}
-
-	{
-		// ƒeƒNƒXƒ`ƒƒİ’è
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
-
-		// ‚P–‡‚Ìƒ|ƒŠƒSƒ“‚Ì’¸“_‚ÆƒeƒNƒXƒ`ƒƒÀ•W‚ğİ’è
-		SetSprite(g_VertexBuffer, TEXTURE_WIDTH * 0.5f, 100.0f, 500, TEXTURE_HEIGHT * 0.3, 0.0f, 0.0f, 1.0f, 1.0f);
-
+		if (sprite[i].useColor) {
+			SetSpriteColor(g_VertexBuffer, sprite[i].pos.x, sprite[i].pos.y, sprite[i].size.x, sprite[i].size.y, 0.0f, 0.0f, 1.0f, 1.0f,sprite[i].color);
+		}
+		else {
+			SetSprite(g_VertexBuffer, sprite[i].pos.x, sprite[i].pos.y, sprite[i].size.x, sprite[i].size.y, 0.0f, 0.0f, 1.0f, 1.0f);
+		}
 		// ƒ|ƒŠƒSƒ“•`‰æ
 		GetDeviceContext()->Draw(4, 0);
 	}

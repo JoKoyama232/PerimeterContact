@@ -93,3 +93,5 @@ char* GetDebugStr(void);
 
 void SetMode(int mode);
 int	GetMode(void);
+bool IsFirstLoad(void);
+void setLoad(bool update);

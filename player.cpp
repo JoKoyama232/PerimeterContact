@@ -51,6 +51,7 @@ static float		camRotY =0.0f;
 static PLAYER		g_Parts[PLAYER_PARTS_MAX];		// プレイヤーのパーツ用
 static XMFLOAT3		dashTbl[2];
 static int			particleWait = 0;
+static RASTERIZER_MODE drawMethod = CULL_MODE_BACK;
 
 static DWORD dashcd;
 static DWORD attackcd;
@@ -259,6 +260,16 @@ void UpdatePlayer(void)
 		if (IsMouseRightPressed() == FALSE) {
 			camRotY = cam->rot.y;
 		}
+		if (GetKeyboardTrigger(DIK_Q))
+		{
+			if (drawMethod == CULL_MODE_BACK) {
+				drawMethod = CULL_MODE_WIREFRAME;
+			}
+			else {
+				drawMethod = CULL_MODE_BACK;
+			}
+
+		}
 
 
 #ifdef _DEBUG
@@ -449,7 +460,7 @@ void DrawPlayer(void)
 {
 	SetLightEnable(false);
 	// カリング無効
-	SetCullingMode(CULL_MODE_WIREFRAME);
+	SetCullingMode(drawMethod);
 
 	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
 
@@ -551,4 +562,8 @@ XMFLOAT3 GetLerp(XMFLOAT3 initialPos, XMFLOAT3 endingPos, float percentage) {
 //337
 float GetDistance3D(XMFLOAT3 pos1, XMFLOAT3 pos2) {
 	return (float)sqrt((pos1.x - pos2.x) * (pos1.x - pos2.x) + (pos1.y - pos2.y) * (pos1.y - pos2.y) + (pos1.z - pos2.z) * (pos1.z - pos2.z));
+}
+
+RASTERIZER_MODE GetRasterizerMode(void) {
+	return drawMethod;
 }

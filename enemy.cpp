@@ -13,6 +13,7 @@
 #include "meshfield.h"
 #include "collision.h"
 #include "debugproc.h"
+#include "player.h"
 #include "enemy.h"
 
 //*****************************************************************************
@@ -32,7 +33,12 @@
 // プロトタイプ宣言
 //*****************************************************************************
 
-
+enum ENEMY_PATTERN {
+	wait = 0,
+	move,
+	attack,
+	run,
+};
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
@@ -198,7 +204,7 @@ void DrawEnemy(void)
 	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
 
 	// カリング無効
-	SetCullingMode(CULL_MODE_WIREFRAME);
+	SetCullingMode(GetRasterizerMode());
 
 	for (int i = 0; i < MAX_ENEMY; i++)
 	{

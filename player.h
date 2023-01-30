@@ -58,3 +58,4 @@ void DrawPlayer(void);
 PLAYER *GetPlayer(void);
 XMFLOAT3 GetLerp(XMFLOAT3 initialPos, XMFLOAT3 endingPos, float percentage);
 float GetDistance3D(XMFLOAT3 pos1, XMFLOAT3 pos2);
+RASTERIZER_MODE GetRasterizerMode(void);
