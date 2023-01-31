@@ -344,7 +344,7 @@ void DrawPoint(void)
 
 	// フォグ有効
 	SetFogEnable(GetFogEnable());
-	PrintDebugProc("Part:%d\n",g_pointidx);
+	//PrintDebugProc("Part:%d\n",g_pointidx);
 }
 
 //=============================================================================

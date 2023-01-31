@@ -174,7 +174,7 @@ void UpdateEnemy(void)
 		XMFLOAT3 pos = g_Enemy[i].pos;
 		pos.y -= (ENEMY_OFFSET_Y - 0.1f);
 		SetPositionShadow(g_Enemy[i].shadowIdx, pos);
-		PrintDebugProc("enemy:X:%f Y:%f Z:%f\n", g_Enemy[i].rot.x, g_Enemy[i].rot.y, g_Enemy[i].rot.z);
+		//PrintDebugProc("enemy:X:%f Y:%f Z:%f\n", g_Enemy[i].rot.x, g_Enemy[i].rot.y, g_Enemy[i].rot.z);
 		UpdateHitbox(g_Enemy[i].gjkList.list, g_Enemy[i].points.VertexNum,
 			g_Enemy[i].points.VertexArray, g_Enemy[i].pos, g_Enemy[i].rot, g_Enemy[i].scl, XMMatrixIdentity());
 

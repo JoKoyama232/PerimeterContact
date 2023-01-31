@@ -381,7 +381,7 @@ void Draw(void)
 		DrawPoint();
 
 		// ƒXƒRƒA‚Ì•`‰æˆ—
-		DrawScore();
+		//DrawScore();
 
 		break;
 	case MODE_RESULT:
@@ -463,8 +463,8 @@ void CheckHit(void)
 				for (int p = 0; p < enemy[i].points.VertexNum; p++) {
 					enemyVerts[p] = AffineTransform(enemy[i].points.VertexArray[p], XMLoadFloat4x4(&enemy[i].mtxWorld));
 				}
-				PrintDebugProc("Enemyhit:X:%f Y:%f Z:%f\n", enemyCapsule.positiona.x, enemyCapsule.positiona.y, enemyCapsule.positiona.z);
-				PrintDebugProc("Enemyhit:X:%f Y:%f Z:%f\n", enemyCapsule.positionb.x, enemyCapsule.positionb.y, enemyCapsule.positionb.z);
+				//PrintDebugProc("Enemyhit:X:%f Y:%f Z:%f\n", enemyCapsule.positiona.x, enemyCapsule.positiona.y, enemyCapsule.positiona.z);
+				//PrintDebugProc("Enemyhit:X:%f Y:%f Z:%f\n", enemyCapsule.positionb.x, enemyCapsule.positionb.y, enemyCapsule.positionb.z);
 				
 				//GJKHit(playerVerts, player->points.VertexNum, enemyVerts, enemy[i].points.VertexNum)
 				//BC‚Ì“–‚½‚è”»’è

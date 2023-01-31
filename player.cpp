@@ -450,8 +450,8 @@ void UpdatePlayer(void)
 
 
 #ifdef _DEBUG	// デバッグ情報を表示する
-	PrintDebugProc("Player:↑ → ↓ ←　Space\n");
-	PrintDebugProc("Player:X:%f Y:%f Z:%f\n", g_Player.pos.x, g_Player.pos.y, g_Player.pos.z);
+	//PrintDebugProc("Player:↑ → ↓ ←　Space\n");
+	//PrintDebugProc("Player:X:%f Y:%f Z:%f\n", g_Player.pos.x, g_Player.pos.y, g_Player.pos.z);
 #endif
 }
 
