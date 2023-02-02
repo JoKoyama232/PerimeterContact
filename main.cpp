@@ -29,12 +29,13 @@
 #include "knife.h"
 #include "skydome.h"
 #include "fade.h"
+#include "3DParticle.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define CLASS_NAME		"AppClass"			// ウインドウのクラス名
-#define WINDOW_NAME		"メッシュ表示"		// ウインドウのキャプション名
+#define WINDOW_NAME		"Desert Duel"		// ウインドウのキャプション名
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -114,7 +115,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		NULL);
 
 	// 初期化処理(ウィンドウを作成してから行う)
-	if(FAILED(Init(hInstance, hWnd, TRUE)))
+	if(FAILED(Init(hInstance, hWnd, true)))
 	{
 		return -1;
 	}
@@ -309,7 +310,7 @@ void Update(void)
 		UpdateBullet();
 
 		UpdateParticle();
-
+		UpdateParticle3D();
 		UpdateKnife();
 
 		// 影の更新処理
@@ -352,8 +353,8 @@ void Draw(void)
 	case MODE_GAME:
 		// プレイヤー視点
 		XMFLOAT3 pos = GetPlayer()->pos;
-		pos.y = 10.0f;			// カメラ酔いを防ぐためにクリアしている
-		SetCameraAT(pos);
+		pos.y += 10.0f;			// カメラ酔いを防ぐためにクリアしている
+		SetCameraPos(pos);
 		SetCamera();
 		DrawSky();
 		// 地面の描画処理
@@ -363,7 +364,7 @@ void Draw(void)
 		DrawShadow();
 
 		// プレイヤーの描画処理
-		DrawPlayer();
+		//DrawPlayer();
 
 		// エネミーの描画処理
 		DrawEnemy();
@@ -378,6 +379,7 @@ void Draw(void)
 		//DrawTree();
 
 		DrawParticle();
+		DrawParticle3D();
 		DrawPoint();
 
 		// スコアの描画処理
@@ -436,6 +438,7 @@ void CheckHit(void)
 	ENEMY  *enemyPart = GetEnemyParts();
 	PLAYER *player = GetPlayer();	// プレイヤーのポインターを初期化
 	KNIFE  *knife  = GetKnife();	// ナイフのポインターを初期化
+	CAMERA* cam = GetCamera();
 	
 	XMFLOAT3 *playerVerts = new XMFLOAT3[player->points.VertexNum];
 	CAPSULEHITBOX playerCapsule = player->hitbox;
@@ -530,6 +533,14 @@ void CheckHit(void)
 
 			//GJKの当たり判定
 			// 当たったからナイフ状態更新
+			//for (int h = 0; h < 10; h++) {
+			//	SetParticle(knife[i].pos, { (rand() % 30 - 15) * 2.0f,5.0f,(rand() % 30 - 15) * 2.0f }, { 0.0f,-2.0f,0.0f }, cam->rot,
+			//		XMFLOAT4(1.0f, 1.0f, 1.0f, 0.5f), 0.1f, 0.1f, false, 0, 240);
+			//	
+
+			//}
+			SetParticle3D(knife[i].pos, {0,0,0},16,true);
+
 			knife[i].state = hit;
 			knife[i].attachedTo = &enemy[j];
 			knife[i].parentRot = knife[i].attachedTo->rot;
@@ -537,13 +548,20 @@ void CheckHit(void)
 			XMVECTOR enemyInfo = XMLoadFloat3(&knife[i].attachedTo->pos);
 			XMFLOAT3 position;
 			knifeInfo -= enemyInfo;
-			XMStoreFloat3(&position, knifeInfo);
-			
+			XMStoreFloat3(&position, knifeInfo/2);
+
+			knifeInfo = XMLoadFloat3(&knife[i].scl);
+			enemyInfo = XMLoadFloat3(&knife[i].attachedTo->scl);
+			knifeInfo /= enemyInfo;
+			XMStoreFloat3(&knife[i].scl, knifeInfo);
+
 			XMMATRIX mtxWorld = XMMatrixTranspose(XMLoadFloat4x4(&enemy[j].mtxWorld));
 			AffineTransform(position, mtxWorld );
 			knife[i].pos = position;
 
 			//当たった時の処理
+			PlaySound(SOUND_LABEL_SE_hit);
+			
 			//enemy[0].hp -= 10;
 			if (enemy[0].hp <= 0) {
 				enemy[0].use = false;
@@ -610,6 +628,7 @@ void SetMode(int mode) {
 	UninitMeshField();
 
 	UninitParticle();
+	UninitParticle3D();
 	UninitKnife();
 	//リザルト処理の終了処理
 	UninitResult();
@@ -666,7 +685,7 @@ void SetMode(int mode) {
 
 		// 弾の初期化
 		InitBullet();
-
+		InitParticle3D();
 		InitParticle();
 		// スコアの初期化
 		InitScore();

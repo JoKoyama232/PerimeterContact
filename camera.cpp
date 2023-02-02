@@ -85,94 +85,92 @@ void UpdateCamera(void)
 	if (mousex < 0.0f)
 	{// 視点旋回「右」
 		g_Camera.rot.y += mousex * 0.005f;
-		if (g_Camera.rot.y > XM_PI)
+		if (g_Camera.rot.y < -XM_PI)
 		{
-			g_Camera.rot.y -= XM_PI * 2.0f;
+			g_Camera.rot.y += XM_PI * 2.0f;
 		}
-
-		g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
-		g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
 	}
 	else if (mousex > 0.0f)
 	{// 視点旋回「左」
 		g_Camera.rot.y += mousex * 0.005f;
-		if (g_Camera.rot.y < -XM_PI)
-		{
-			g_Camera.rot.y += XM_PI * 2.0f;
-		}
-
-		g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
-		g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
-	}
-
-	if (mousey < 0.0f)
-	{// 注視点移動「下」
-		g_Camera.pos.y += mousey * 0.1f;
-	}
-	else if (mousey > 0.0f)
-	{// 注視点移動「上」
-		g_Camera.pos.y += mousey * 0.1f;
-	}
-	if (GetMode() == MODE_GAME) {
-		// レイキャストして足元の高さを求める
-		XMFLOAT3 HitPosition;		// 交点
-		XMFLOAT3 Normal;			// ぶつかったポリゴンの法線ベクトル（向き）
-		bool ans = RayHitField(g_Camera.pos, &HitPosition, &Normal);
-		if (ans && g_Camera.pos.y < HitPosition.y + 10.0f)
-		{
-			g_Camera.pos.y = HitPosition.y + 10.0f;
-		}
-	}
-
-	if (GetKeyboardPress(DIK_Y))
-	{// 視点移動「上」
-		g_Camera.pos.y += VALUE_MOVE_CAMERA;
-	}
-
-	if (GetKeyboardPress(DIK_N))
-	{// 視点移動「下」
-		g_Camera.pos.y -= VALUE_MOVE_CAMERA;
-	}
-
-	if (GetKeyboardPress(DIK_Q))
-	{// 注視点旋回「左」
-		g_Camera.rot.y -= VALUE_ROTATE_CAMERA;
-		if (g_Camera.rot.y < -XM_PI)
-		{
-			g_Camera.rot.y += XM_PI * 2.0f;
-		}
-
-		g_Camera.at.x = g_Camera.pos.x + sinf(g_Camera.rot.y) * g_Camera.len;
-		g_Camera.at.z = g_Camera.pos.z + cosf(g_Camera.rot.y) * g_Camera.len;
-	}
-
-	if (GetKeyboardPress(DIK_E))
-	{// 注視点旋回「右」
-		g_Camera.rot.y += VALUE_ROTATE_CAMERA;
 		if (g_Camera.rot.y > XM_PI)
 		{
 			g_Camera.rot.y -= XM_PI * 2.0f;
 		}
-
-		g_Camera.at.x = g_Camera.pos.x + sinf(g_Camera.rot.y) * g_Camera.len;
-		g_Camera.at.z = g_Camera.pos.z + cosf(g_Camera.rot.y) * g_Camera.len;
 	}
 
-	
-
-	if (GetKeyboardPress(DIK_U))
-	{// 近づく
-		g_Camera.len -= VALUE_MOVE_CAMERA;
-		g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
-		g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
+	if (mousey != 0.0f)
+	{// 注視点移動「下」
+		g_Camera.rot.x -= mousey * 0.005f;
+		if (g_Camera.rot.x > XM_PI/2)
+		{
+			g_Camera.rot.x = XM_PI / 2;
+		}
+		else if (g_Camera.rot.x < -XM_PI/2)
+		{
+			g_Camera.rot.x = -XM_PI / 2;
+		}
 	}
+	//if (GetMode() == MODE_GAME) {
+	//	// レイキャストして足元の高さを求める
+	//	XMFLOAT3 HitPosition;		// 交点
+	//	XMFLOAT3 Normal;			// ぶつかったポリゴンの法線ベクトル（向き）
+	//	bool ans = RayHitField(g_Camera.pos, &HitPosition, &Normal);
+	//	if (ans && g_Camera.pos.y < HitPosition.y + 10.0f)
+	//	{
+	//		g_Camera.pos.y = HitPosition.y + 10.0f;
+	//	}
+	//}
 
-	if (GetKeyboardPress(DIK_M))
-	{// 離れる
-		g_Camera.len += VALUE_MOVE_CAMERA;
-		g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
-		g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
-	}
+	//if (GetKeyboardPress(DIK_Y))
+	//{// 視点移動「上」
+	//	g_Camera.pos.y += VALUE_MOVE_CAMERA;
+	//}
+
+	//if (GetKeyboardPress(DIK_N))
+	//{// 視点移動「下」
+	//	g_Camera.pos.y -= VALUE_MOVE_CAMERA;
+	//}
+
+	//if (GetKeyboardPress(DIK_Q))
+	//{// 注視点旋回「左」
+	//	g_Camera.rot.y -= VALUE_ROTATE_CAMERA;
+	//	if (g_Camera.rot.y < -XM_PI)
+	//	{
+	//		g_Camera.rot.y += XM_PI * 2.0f;
+	//	}
+
+	//	g_Camera.at.x = g_Camera.pos.x + sinf(g_Camera.rot.y) * g_Camera.len;
+	//	g_Camera.at.z = g_Camera.pos.z + cosf(g_Camera.rot.y) * g_Camera.len;
+	//}
+
+	//if (GetKeyboardPress(DIK_E))
+	//{// 注視点旋回「右」
+	//	g_Camera.rot.y += VALUE_ROTATE_CAMERA;
+	//	if (g_Camera.rot.y > XM_PI)
+	//	{
+	//		g_Camera.rot.y -= XM_PI * 2.0f;
+	//	}
+
+	//	g_Camera.at.x = g_Camera.pos.x + sinf(g_Camera.rot.y) * g_Camera.len;
+	//	g_Camera.at.z = g_Camera.pos.z + cosf(g_Camera.rot.y) * g_Camera.len;
+	//}
+
+	//
+
+	//if (GetKeyboardPress(DIK_U))
+	//{// 近づく
+	//	g_Camera.len -= VALUE_MOVE_CAMERA;
+	//	g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
+	//	g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
+	//}
+
+	//if (GetKeyboardPress(DIK_M))
+	//{// 離れる
+	//	g_Camera.len += VALUE_MOVE_CAMERA;
+	//	g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
+	//	g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
+	//}
 
 	// カメラを初期に戻す
 	if (GetKeyboardPress(DIK_R))
@@ -311,6 +309,17 @@ void SetCameraAT(XMFLOAT3 pos)
 	// カメラの視点をカメラのY軸回転に対応させている
 	g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
 	g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
+
+}
+
+void SetCameraPos(XMFLOAT3 pos)
+{
+	// カメラの注視点をプレイヤーの座標にしてみる
+	g_Camera.pos = pos;
+	g_Camera.at = pos;
+	g_Camera.at.x = g_Camera.pos.x + sinf(g_Camera.rot.y) * g_Camera.len;
+	g_Camera.at.z = g_Camera.pos.z + cosf(g_Camera.rot.y) * g_Camera.len;
+	g_Camera.at.y = g_Camera.pos.y + sinf(g_Camera.rot.x) * g_Camera.len;
 
 }
 

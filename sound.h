@@ -24,7 +24,7 @@ enum
 	SOUND_LABEL_SE_laser000,	// 
 	SOUND_LABEL_SE_lockon000,	// 
 	SOUND_LABEL_SE_shot000,		// 
-	SOUND_LABEL_SE_shot001,		// 
+	SOUND_LABEL_SE_hit,		// 
 
 	SOUND_LABEL_BGM_maou,		// BGM Maou
 

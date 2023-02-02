@@ -114,6 +114,9 @@
     <ClInclude Include="fade.h">
       <Filter>ヘッダー ファイル\描画オブジェクト</Filter>
     </ClInclude>
+    <ClInclude Include="3DParticle.h">
+      <Filter>ヘッダー ファイル\ゲームオブジェクト</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="collision.cpp">
@@ -196,6 +199,9 @@
     </ClCompile>
     <ClCompile Include="tutorial.cpp">
       <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="3DParticle.cpp">
+      <Filter>ソース ファイル\ゲームオブジェクト</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

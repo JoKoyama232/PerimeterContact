@@ -171,17 +171,17 @@ void UpdateParticle(void)
 				g_aParticle[nCntParticle].pos.y += g_aParticle[nCntParticle].move.y;
 
 				//重力がある　かつ　適用範囲外
-				if (g_aParticle[nCntParticle].deltaMove.y < 0 &&
-					g_aParticle[nCntParticle].pos.y <= g_aParticle[nCntParticle].fSizeY / 2)
-				{// 着地した
-					g_aParticle[nCntParticle].pos.y = g_aParticle[nCntParticle].fSizeY / 2;
-					g_aParticle[nCntParticle].move.y = -g_aParticle[nCntParticle].move.y * 0.75f;
-				}
+				//if (g_aParticle[nCntParticle].deltaMove.y < 0 &&
+				//	g_aParticle[nCntParticle].pos.y <= g_aParticle[nCntParticle].fSizeY / 2)
+				//{// 着地した
+				//	g_aParticle[nCntParticle].pos.y = g_aParticle[nCntParticle].fSizeY / 2;
+				//	g_aParticle[nCntParticle].move.y = -g_aParticle[nCntParticle].move.y * 0.75f;
+				//}
 
 				//変動値を移動値に適用
-				g_aParticle[nCntParticle].move.x *= g_aParticle[nCntParticle].deltaMove.x;
-				g_aParticle[nCntParticle].move.y *= g_aParticle[nCntParticle].deltaMove.y;
-				g_aParticle[nCntParticle].move.z *= g_aParticle[nCntParticle].deltaMove.z;
+				g_aParticle[nCntParticle].move.x += g_aParticle[nCntParticle].deltaMove.x;
+				g_aParticle[nCntParticle].move.y += g_aParticle[nCntParticle].deltaMove.y;
+				g_aParticle[nCntParticle].move.z += g_aParticle[nCntParticle].deltaMove.z;
 
 #ifdef DISP_SHADOW
 				//パーティクルの影処理
@@ -211,15 +211,15 @@ void UpdateParticle(void)
 				else
 				{
 					//寿命15フレーム以下：α値を下げフェード処理
-					if(g_aParticle[nCntParticle].nLife <= 15)
-					{
-						// α値設定
-						g_aParticle[nCntParticle].material.Diffuse.w -= 0.06f;
-						if(g_aParticle[nCntParticle].material.Diffuse.w < 0.0f)
-						{
-							g_aParticle[nCntParticle].material.Diffuse.w = 0.0f;
-						}
-					}
+					//if(g_aParticle[nCntParticle].nLife <= 15)
+					//{
+					//	// α値設定
+					//	g_aParticle[nCntParticle].material.Diffuse.w -= 0.06f;
+					//	if(g_aParticle[nCntParticle].material.Diffuse.w < 0.0f)
+					//	{
+					//		g_aParticle[nCntParticle].material.Diffuse.w = 0.0f;
+					//	}
+					//}
 				}
 			}
 		}

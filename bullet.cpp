@@ -9,6 +9,7 @@
 #include "shadow.h"
 #include "bullet.h"
 #include "collision.h"
+#include "camera.h"
 
 
 //*****************************************************************************
@@ -158,8 +159,8 @@ void DrawBullet(void)
 {
 	// ライティングを無効
 	SetLightEnable(false);
-
-	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
+	CAMERA *cam = GetCamera();
+	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld, mtxView;
 
 	// 頂点バッファ設定
 	UINT stride = sizeof(VERTEX_3D);
@@ -176,9 +177,20 @@ void DrawBullet(void)
 			// ワールドマトリックスの初期化
 			mtxWorld = XMMatrixIdentity();
 
-			// 回転を反映
-			mtxRot = XMMatrixRotationRollPitchYaw(g_Bullet[i].rot.x, g_Bullet[i].rot.y + XM_PI, g_Bullet[i].rot.z);
-			mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
+			// ビューマトリックスを取得
+			mtxView = XMLoadFloat4x4(&cam->mtxView);
+
+			mtxWorld.r[0].m128_f32[0] = mtxView.r[0].m128_f32[0];
+			mtxWorld.r[0].m128_f32[1] = mtxView.r[1].m128_f32[0];
+			mtxWorld.r[0].m128_f32[2] = mtxView.r[2].m128_f32[0];
+
+			mtxWorld.r[1].m128_f32[0] = mtxView.r[0].m128_f32[1];
+			mtxWorld.r[1].m128_f32[1] = mtxView.r[1].m128_f32[1];
+			mtxWorld.r[1].m128_f32[2] = mtxView.r[2].m128_f32[1];
+
+			mtxWorld.r[2].m128_f32[0] = mtxView.r[0].m128_f32[2];
+			mtxWorld.r[2].m128_f32[1] = mtxView.r[1].m128_f32[2];
+			mtxWorld.r[2].m128_f32[2] = mtxView.r[2].m128_f32[2];
 
 			// 移動を反映
 			mtxTranslate = XMMatrixTranslation(g_Bullet[i].pos.x, g_Bullet[i].pos.y, g_Bullet[i].pos.z);

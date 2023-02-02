@@ -32,6 +32,7 @@ typedef struct
 	XMFLOAT3		pos;			// 位置
 	XMFLOAT3		scale;			// スケール
 	MATERIAL		material;		// マテリアル
+	int				indx;
 	bool			bUse;			// 使用しているかどうか
 
 } VERTEXINFO;
@@ -90,7 +91,7 @@ HRESULT InitPoint(void)
 	{
 		g_PlayerModelVerticies[playerModelVertexCount].pos = player->points.VertexArray[playerModelVertexCount];
 		g_PlayerModelVerticies[playerModelVertexCount].scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
-
+		g_PlayerModelVerticies[playerModelVertexCount].indx = 0;
 		ZeroMemory(&g_PlayerModelVerticies[playerModelVertexCount].material, sizeof(g_PlayerModelVerticies[playerModelVertexCount].material));
 		g_PlayerModelVerticies[playerModelVertexCount].material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -103,7 +104,7 @@ HRESULT InitPoint(void)
 	{
 		g_EnemyModelVerticies[enemyModelVertexCount].pos = enemy[0].points.VertexArray[enemyModelVertexCount];
 		g_EnemyModelVerticies[enemyModelVertexCount].scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
-
+		g_EnemyModelVerticies[enemyModelVertexCount].indx = 0;
 		ZeroMemory(&g_EnemyModelVerticies[enemyModelVertexCount].material, sizeof(g_EnemyModelVerticies[enemyModelVertexCount].material));
 		g_EnemyModelVerticies[enemyModelVertexCount].material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -160,13 +161,21 @@ void UpdatePoint(void)
 		g_EnemyModelVerticies[enemyModelVertexCount].pos = AffineTransform(enemy[0].points.VertexArray[enemyModelVertexCount], XMLoadFloat4x4(&enemy[0].mtxWorld));
 	}
 
-	if (GetKeyboardPress(DIK_LSHIFT))
-	{
-		g_pointidx++;
-		if (g_pointidx > enemy[0].points.VertexNum) {
-			g_pointidx -= enemy[0].points.VertexNum;
-		}
-	}
+	//if (GJKHit(player->points.VertexArray, player->points.VertexNum, enemy[0].gjkList.list, enemy[0].points.VertexNum))
+	//{
+	//	for (short point = 0; point < enemy[0].points.VertexNum; point++) 
+	//	{
+
+	//	}
+	//}
+
+	//if (GetKeyboardPress(DIK_LSHIFT))
+	//{
+	//	g_pointidx++;
+	//	if (g_pointidx > enemy[0].points.VertexNum) {
+	//		g_pointidx -= enemy[0].points.VertexNum;
+	//	}
+	//}
 	
 }
 
@@ -175,9 +184,11 @@ void UpdatePoint(void)
 //=============================================================================
 void DrawPoint(void)
 {
+	
 	XMMATRIX mtxScl, mtxTranslate, mtxWorld, mtxView;
 	CAMERA* cam = GetCamera();
-
+	int y = 0;
+	
 	// ライティングを無効に
 	SetLightEnable(false);
 

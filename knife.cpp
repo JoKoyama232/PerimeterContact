@@ -10,7 +10,7 @@
 #include "model.h"
 #include "collision.h"
 #include "enemy.h"
-
+#include "player.h"
 #include "knife.h"
 
 //*****************************************************************************
@@ -32,6 +32,7 @@
 // グローバル変数
 //*****************************************************************************
 static KNIFE			g_Knife[MAX_KNIFE];				// ナイフ
+static int				hitKnife = 0;
 
 
 //=============================================================================
@@ -84,6 +85,7 @@ void UninitKnife(void)
 //=============================================================================
 void UpdateKnife(void)
 {
+	hitKnife = 0;
 	// ナイフを動かく場合は、影も合わせて動かす事を忘れないようにね！
 	for (int i = 0; i < MAX_KNIFE; i++)
 	{
@@ -131,7 +133,7 @@ void DrawKnife(void)
 	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
 
 	// カリング無効
-	SetCullingMode(CULL_MODE_WIREFRAME);
+	SetCullingMode(GetRasterizerMode());
 
 	for (int i = 0; i < MAX_KNIFE; i++)
 	{
@@ -193,9 +195,9 @@ void FireKnife(XMFLOAT3 firePosition,XMFLOAT3 fireDirection) {
 		g_Knife[i].latestUpdate = timeGetTime();
 		g_Knife[i].pos = firePosition;
 		g_Knife[i].rot.y = fireDirection.y;
-		g_Knife[i].velocity.x = -sinf(fireDirection.y)* THROW_DIRECTION_POW;
-		g_Knife[i].velocity.z = -cosf(fireDirection.y)* THROW_DIRECTION_POW;
-		g_Knife[i].velocity.y = THROW_HEIGHT_POW;
+		g_Knife[i].velocity.x = sinf(fireDirection.y)* THROW_DIRECTION_POW;
+		g_Knife[i].velocity.z = cosf(fireDirection.y)* THROW_DIRECTION_POW;
+		g_Knife[i].velocity.y = sinf(fireDirection.x)* THROW_HEIGHT_POW+ THROW_HEIGHT_POW;
 		g_Knife[i].state = fired;
 		return;
 

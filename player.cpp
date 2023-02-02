@@ -259,9 +259,7 @@ void UpdatePlayer(void)
 			//	g_Player.pos.y, g_Player.pos.z - cosf(g_Player.rot.y) * VALUE_MOVE * 60);
 			SetBullet(g_Player.pos, &enemy[0].pos, 0.1f);
 		}
-		if (IsMouseRightPressed() == FALSE) {
-			camRotY = cam->rot.y;
-		}
+
 		if (GetKeyboardTrigger(DIK_Q))
 		{
 			if (drawMethod == CULL_MODE_BACK) {
@@ -284,10 +282,10 @@ void UpdatePlayer(void)
 #endif
 
 
-		//移動量が０以上であれば移動する
+		//移動量が0.3以上であれば移動する
 		if (g_Player.spd > 0.3f)
 		{
-			g_Player.rot.y = g_Player.dir + camRotY;
+			g_Player.rot.y = g_Player.dir + cam->rot.y;
 
 			// 入力のあった方向へプレイヤーを向かせて移動させる
 			//プレイヤーの向いている方向を保存
@@ -362,7 +360,7 @@ void UpdatePlayer(void)
 	if (IsMouseLeftTriggered())
 	{
 		//SetBullet(g_Player.pos, XMFLOAT3(0,100,0), XMFLOAT3(0, 0, 400));
-		FireKnife(g_Player.pos, g_Player.rot);
+		FireKnife(g_Player.pos, cam->rot);
 	}
 
 	g_Player.spd *= 0.5f;

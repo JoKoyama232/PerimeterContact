@@ -43,7 +43,7 @@ SOUNDPARAM g_aParam[SOUND_LABEL_MAX] =
 	{ (char*)"data/SE/laser000.wav", 0 },		// ’e”­ŽË‰¹
 	{ (char*)"data/SE/lockon000.wav", 0 },		// ’e”­ŽË‰¹
 	{ (char*)"data/SE/shot000.wav", 0 },		// ’e”­ŽË‰¹
-	{ (char*)"data/SE/shot001.wav", 0 },		// ƒqƒbƒg‰¹
+	{ (char*)"data/SE/hitSound.wav", 0 },		// ƒqƒbƒg‰¹
 
 	{ (char*)"data/BGM/maou.wav", -1 },			// BGM Maou
 
