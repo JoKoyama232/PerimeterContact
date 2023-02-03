@@ -80,7 +80,8 @@ void UpdateCamera(void)
 	float mousex = (float)GetMouseX();
 	float mousey = (float)GetMouseY();
 	if (GetMode() == MODE_GAME && !GetKeyboardPress(DIK_P)) {
-		SetPhysicalCursorPos((int)(g_windowPos.left + screenCenter.x / 2), (int)(g_windowPos.top + screenCenter.y / 2));
+		//SetPhysicalCursorPos((int)(g_windowPos.left + screenCenter.x / 2), (int)(g_windowPos.top + screenCenter.y / 2));
+		ShowCursor(false);
 	}
 	if (mousex < 0.0f)
 	{// 視点旋回「右」

@@ -251,13 +251,13 @@ void UpdatePlayer(void)
 		if (GetKeyboardTrigger(DIK_SPACE) && cdTimer - dashcd > 3000)
 		{
 			//DASH
-			//g_Player.tblNo = 1;
-			//g_Player.time = 0.5f;
-			//dashcd = cdTimer;
-			//dashTbl[0] = g_Player.pos;
-			//dashTbl[1] = XMFLOAT3(g_Player.pos.x - sinf(g_Player.rot.y) * VALUE_MOVE * 60,
-			//	g_Player.pos.y, g_Player.pos.z - cosf(g_Player.rot.y) * VALUE_MOVE * 60);
-			SetBullet(g_Player.pos, &enemy[0].pos, 0.1f);
+			g_Player.tblNo = 1;
+			g_Player.time = 0.5f;
+			dashcd = cdTimer;
+			dashTbl[0] = g_Player.pos;
+			dashTbl[1] = XMFLOAT3(g_Player.pos.x - sinf(g_Player.rot.y) * VALUE_MOVE * 60,
+				g_Player.pos.y, g_Player.pos.z - cosf(g_Player.rot.y) * VALUE_MOVE * 60);
+			//SetBullet(g_Player.pos, &enemy[0].pos, 0.1f);
 		}
 
 		if (GetKeyboardTrigger(DIK_Q))
@@ -361,6 +361,10 @@ void UpdatePlayer(void)
 	{
 		//SetBullet(g_Player.pos, XMFLOAT3(0,100,0), XMFLOAT3(0, 0, 400));
 		FireKnife(g_Player.pos, cam->rot);
+	}
+	if (IsMouseRightTriggered())
+	{
+		explodeKnife();
 	}
 
 	g_Player.spd *= 0.5f;

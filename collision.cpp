@@ -411,9 +411,9 @@ XMVECTOR FindFurthestPointFrom(XMVECTOR direction, XMFLOAT3* gjkList , unsigned 
 }
 
 //=============================================================================
-// ミンコスキー差：
-// ポリゴンAの頂点からポリゴンBの頂点を全て引くことで
-// 新たなポリゴンCを形成する。
+//：
+// ]ゴンAの頂点からポリゴンBの頂点を全て引くことで
+// たなポリゴンCを形成する。
 // このポリゴンCは全ての方向に一番遠い点（サポートポイントと呼ぶ）
 // を結ぶことでできている。
 // そして、この頂点はAからBを引いたため、このポリゴン内に原点が含まれると
@@ -442,6 +442,7 @@ void PushPop(gjkpoint* points,XMVECTOR pos) {
 	points->supportPoints[3] = points->supportPoints[2];
 	points->supportPoints[2] = points->supportPoints[1];
 	points->supportPoints[1] = points->supportPoints[0];
+	
 	XMStoreFloat3(&points->supportPoints[0],pos);
 	points->listSize ++;
 	if (points->listSize > 4)points->listSize = 4;
@@ -472,7 +473,8 @@ bool GJKHit(XMFLOAT3* gjkListA, unsigned short aSize, XMFLOAT3* gjkListB, unsign
 	PushPop(&points, supportPoint);		//一番目のサポートポイントを保存
 
 	//方向をサポートポイントの逆方向に修正
-	//（ミンコスキー差に原点を含みたいため逆方向にする）
+	//（ミンコスキー差に原点を含みたいため逆方向にす
+	
 	direction = -supportPoint;			
 	int loop = 0;
 	while (true) {

@@ -12,7 +12,7 @@
 #include "enemy.h"
 #include "player.h"
 #include "knife.h"
-
+#include "3DParticle.h"
 //*****************************************************************************
 // É}ÉNÉçíËã`
 //*****************************************************************************
@@ -200,6 +200,22 @@ void FireKnife(XMFLOAT3 firePosition,XMFLOAT3 fireDirection) {
 		g_Knife[i].velocity.y = sinf(fireDirection.x)* THROW_HEIGHT_POW+ THROW_HEIGHT_POW;
 		g_Knife[i].state = fired;
 		return;
+
+	}
+}
+
+void explodeKnife() {
+	for (int i = 0; i < MAX_KNIFE; i++)
+	{
+		if (g_Knife[i].state != hit) continue;
+		XMMATRIX mtxRot, mtxWorld;
+		mtxWorld = XMMatrixIdentity();
+		mtxRot = XMMatrixRotationRollPitchYaw(-g_Knife[i].parentRot.z, -g_Knife[i].parentRot.y + XM_PI, -g_Knife[i].parentRot.x);
+		mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
+		mtxWorld = XMMatrixMultiply(mtxWorld, XMLoadFloat4x4(&g_Knife[i].attachedTo->mtxWorld));
+		SetParticle3D(AffineTransform(g_Knife[i].pos, mtxWorld), { 0.0f,1.0f,0.0f }, 20, true);
+		g_Knife[i].state = unused;
+		g_Knife[i].scl = { 0.5f,0.5f,0.5f };
 
 	}
 }

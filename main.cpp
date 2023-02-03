@@ -539,7 +539,7 @@ void CheckHit(void)
 			//	
 
 			//}
-			SetParticle3D(knife[i].pos, {0,0,0},16,true);
+			//SetParticle3D(knife[i].pos, {0,0,0},16,true);
 
 			knife[i].state = hit;
 			knife[i].attachedTo = &enemy[j];

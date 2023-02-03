@@ -143,6 +143,7 @@ void SetParticle3D(XMFLOAT3 position, XMFLOAT3 deltaPosition, float ShowTime, bo
 		g_Particle3D[i].velocity = deltaPosition;
 		g_Particle3D[i].showTime = 16;
 		g_Particle3D[i].use = true;
+		return;
 	}
 }
 

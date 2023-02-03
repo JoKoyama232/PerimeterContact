@@ -56,3 +56,4 @@ void DrawKnife(void);
 
 KNIFE* GetKnife(void);
 void FireKnife(XMFLOAT3 firePosition, XMFLOAT3 fireDirection);
+void explodeKnife(void);
