@@ -154,6 +154,7 @@
     <ClInclude Include="debugproc.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="fade.h" />
+    <ClInclude Include="hud.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="knife.h" />
     <ClInclude Include="light.h" />
@@ -184,6 +185,7 @@
     <ClCompile Include="debugproc.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="fade.cpp" />
+    <ClCompile Include="hud.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="knife.cpp" />
     <ClCompile Include="light.cpp" />
