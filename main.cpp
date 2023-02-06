@@ -30,6 +30,7 @@
 #include "skydome.h"
 #include "fade.h"
 #include "3DParticle.h"
+#include "hud.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -320,7 +321,7 @@ void Update(void)
 		CheckHit();
 
 		// スコアの更新処理
-		UpdateScore();
+		UpdateHud();
 		break;
 	case MODE_RESULT:
 		UpdateResult();
@@ -384,6 +385,7 @@ void Draw(void)
 
 		// スコアの描画処理
 		//DrawScore();
+		DrawHud();
 
 		break;
 	case MODE_RESULT:
@@ -468,18 +470,13 @@ void CheckHit(void)
 				}
 				//PrintDebugProc("Enemyhit:X:%f Y:%f Z:%f\n", enemyCapsule.positiona.x, enemyCapsule.positiona.y, enemyCapsule.positiona.z);
 				//PrintDebugProc("Enemyhit:X:%f Y:%f Z:%f\n", enemyCapsule.positionb.x, enemyCapsule.positionb.y, enemyCapsule.positionb.z);
-				
-				//GJKHit(playerVerts, player->points.VertexNum, enemyVerts, enemy[i].points.VertexNum)
+				//CapsuleCollision(playerCapsule, enemyCapsule)
 				//BCの当たり判定
-				if (CapsuleCollision(playerCapsule,enemyCapsule))
+				if (GJKHit(playerVerts, player->points.VertexNum, enemyVerts, enemy[i].points.VertexNum))
 				{
-
-					// 敵キャラクターは倒される
-					/*enemy[i].use = false;*/
-					ReleaseShadow(enemy[i].shadowIdx);
-
-					// スコアを足す
-					AddScore(100);
+					player->hpCurrent -= 5;
+					player->pos.x += sinf(player->rot.y) * player->spd * 3;
+					player->pos.z += cosf(player->rot.y) * player->spd * 3;
 
 				}
 			}
@@ -632,6 +629,7 @@ void SetMode(int mode) {
 	UninitKnife();
 	//リザルト処理の終了処理
 	UninitResult();
+	UninitHud();
 
 	
 
@@ -689,6 +687,7 @@ void SetMode(int mode) {
 		InitParticle();
 		// スコアの初期化
 		InitScore();
+		InitHud();
 		//PlaySound(SOUND_LABEL_BGM_sample002);
 		break;
 	case MODE_RESULT:

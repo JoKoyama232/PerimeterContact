@@ -57,9 +57,9 @@ HRESULT InitEnemy(void)
 		g_Enemy[i].load = true;
 
 		g_Enemy[i].pos = XMFLOAT3(0.0f, ENEMY_OFFSET_Y, 20.0f);
-		g_Enemy[i].hitbox.positiona = { 0.0f, 3.0f, 0.0f };
-		g_Enemy[i].hitbox.positionb = { 0.0f,2* ENEMY_OFFSET_Y-3.0f, 0.0f };
-		g_Enemy[i].hitbox.radius = 3.0f;
+		g_Enemy[i].hitbox.radius = 60.0f;
+		g_Enemy[i].hitbox.positiona = { 0.0f, 0.0f, -100.0f };
+		g_Enemy[i].hitbox.positionb = { 0.0f, 0.0f, 100.0f };
 		g_Enemy[i].rot = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		g_Enemy[i].scl = XMFLOAT3(2.0f, 2.0f, 2.0f);
 		g_Enemy[i].hp = 50;
@@ -187,13 +187,6 @@ void UpdateEnemy(void)
 		UpdateHitbox(g_Parts[i].gjkList.list, g_Parts[i].points.VertexNum,
 			g_Parts[i].points.VertexArray, g_Parts[i].pos, g_Parts[i].rot, g_Parts[i].scl, XMLoadFloat4x4(&g_Parts[i].attachedTo->mtxWorld));
 
-		XMVECTOR rot = XMVector3Normalize(XMLoadFloat3(&g_Parts[i].rot));
-		XMVECTOR pos = FindFurthestPointFrom(rot, g_Parts[i].gjkList.list, g_Parts[i].points.VertexNum);
-		XMFLOAT3 posf3;
-		XMStoreFloat3(&posf3, pos);
-		XMFLOAT3 hitPos, hitNorm;
-		RayHitField(posf3,&hitPos,&hitNorm);
-			
 	}
 
 }

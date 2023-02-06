@@ -392,7 +392,7 @@ bool CapsuleCollision(CAPSULEHITBOX a, CAPSULEHITBOX b)
 
 //ある方向に一番遠い頂点を見つける関数
 XMVECTOR FindFurthestPointFrom(XMVECTOR direction, XMFLOAT3* gjkList , unsigned short size) {
-	XMVECTOR furthestPoint;			//一番遠い頂点の保管場所
+	XMVECTOR furthestPoint = {0.0f,0.0f,0.0f};			//一番遠い頂点の保管場所
 	float maxDistance = -FLT_MAX;	//一番遠い頂点への距離
 
 	//ポリゴンの頂点全てをループ

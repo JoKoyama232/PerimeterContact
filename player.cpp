@@ -1,7 +1,7 @@
 //=============================================================================
 //
-// モデル処理 [player.cpp]
-// Author : 
+// プレイヤー処理 [player.cpp]
+// Author : 小山　城
 //
 //=============================================================================
 #include "main.h"
@@ -110,6 +110,8 @@ HRESULT InitPlayer(void)
 	g_Player.hitbox.positiona = { 0.0f, 3.0f, 0.0f };
 	g_Player.hitbox.positionb = { 0.0f, PLAYER_OFFSET_Y * 2.0f -3.0f, 0.0f };
 	g_Player.hitbox.radius = 3.0f;
+	g_Player.hpMax = 100;
+	g_Player.hpCurrent = g_Player.hpMax;
 	g_Player.use = true;
 
 	// ここでプレイヤー用の影を作成している
@@ -251,13 +253,13 @@ void UpdatePlayer(void)
 		if (GetKeyboardTrigger(DIK_SPACE) && cdTimer - dashcd > 3000)
 		{
 			//DASH
-			g_Player.tblNo = 1;
-			g_Player.time = 0.5f;
-			dashcd = cdTimer;
-			dashTbl[0] = g_Player.pos;
-			dashTbl[1] = XMFLOAT3(g_Player.pos.x - sinf(g_Player.rot.y) * VALUE_MOVE * 60,
-				g_Player.pos.y, g_Player.pos.z - cosf(g_Player.rot.y) * VALUE_MOVE * 60);
-			//SetBullet(g_Player.pos, &enemy[0].pos, 0.1f);
+			//g_Player.tblNo = 1;
+			//g_Player.time = 0.5f;
+			//dashcd = cdTimer;
+			//dashTbl[0] = g_Player.pos;
+			//dashTbl[1] = XMFLOAT3(g_Player.pos.x - sinf(g_Player.rot.y) * VALUE_MOVE * 60,
+			//	g_Player.pos.y, g_Player.pos.z - cosf(g_Player.rot.y) * VALUE_MOVE * 60);
+			SetBullet(g_Player.pos, &enemy[0].pos, 0.1f);
 		}
 
 		if (GetKeyboardTrigger(DIK_Q))

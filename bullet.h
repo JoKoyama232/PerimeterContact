@@ -19,23 +19,27 @@
 //*****************************************************************************
 typedef struct
 {
-	XMFLOAT4X4	mtxWorld;		// ワールドマトリックス
-	XMFLOAT3	pos;			// 位置
+	XMFLOAT3			pos;		// ポリゴンの位置
+	XMFLOAT3			rot;		// ポリゴンの向き(回転)
+	XMFLOAT3			scl;		// ポリゴンの大きさ(スケール)
+
+	XMFLOAT4X4			mtxWorld;	// ワールドマトリックス
+
+	bool				load;
+	DX11_MODEL			model;		// モデル情報
+	VERTEX_DATA			points;
+
+
 	XMFLOAT3	*target;
 	XMFLOAT3	targetPos;			// スケール
 	XMFLOAT3	startPos;
 	XMFLOAT3	middlePos;
-	XMFLOAT3	rot;			// 角度
-	MATERIAL	material;		// マテリアル
 	
+
 	DWORD		timer;
-	float		fWidth;			// 幅
-	float		fHeight;		// 高さ
 	float		speed;
 	float		progress;
-	int			shadowIdx;		// 影ID
 	bool		use;			// 使用しているかどうか
-
 
 } BULLET;
 

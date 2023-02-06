@@ -1,23 +1,29 @@
 //=============================================================================
 //
-// リザルト画面処理 [result.cpp]
-// Author : 
+// HUD処理 [hud.cpp]
+// Author : 小山　城
 //
 //=============================================================================
-#include "hud.h"
+#include "main.h"
+#include "renderer.h"
+#include "sprite.h"
+#include "model.h"
+#include "collision.h"
 #include "enemy.h"
 #include "player.h"
-#include "title.h"
+#include "hud.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_WIDTH				(SCREEN_WIDTH)	// 背景サイズ
-#define TEXTURE_HEIGHT				(SCREEN_HEIGHT)	// 
-#define TEXTURE_MAX					(3)				// テクスチャの数
+#define TEXTURE_MAX					(2)				// テクスチャの数
+
+
 enum {
-	hpBar = 0,
-	hpFrame,
+	playerHpFrame = 0,
+	playerHpBar,
+	enemyHpBar,
+	enemyHpFrame,
 };
 
 //*****************************************************************************
@@ -27,20 +33,19 @@ static ID3D11Buffer* g_VertexBuffer = NULL;		// 頂点情報
 static ID3D11ShaderResourceView* g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
 static char* g_TexturName[TEXTURE_MAX] = {
-	"data/TEXTURE/end.png",
-	"data/TEXTURE/result_logo.png",
-	"data/TEXTURE/number16x32.png",
+	"data/TEXTURE/HPBar.png",
+	"data/TEXTURE/HPFrame.png",
 };
 
-
-
-
-static BOOL						g_Load = FALSE;
+HUD	hud[TEXTURE_MAX];
+static XMFLOAT4 hudColor;
+static bool		g_Use = true;
+static bool		g_Load = false;
 
 //=============================================================================
 // 初期化処理
 //=============================================================================
-HRESULT InitResult(void)
+HRESULT InitHud(void)
 {
 	ID3D11Device* pDevice = GetDevice();
 
@@ -56,6 +61,19 @@ HRESULT InitResult(void)
 			NULL);
 	}
 
+	hudColor = { 1.0f,1.0f,1.0f,0.75f };
+
+	hud[playerHpFrame].pos = { SCREEN_WIDTH / 2,50.0f };
+	hud[playerHpFrame].size = { 640.0f,80.0f };
+	hud[playerHpFrame].texturePos = { 0.0f,0.0f };
+	hud[playerHpFrame].texturePercent = { 1.0f,1.0f };
+
+	hud[playerHpBar].pos = { SCREEN_WIDTH / 2,50.0f };
+	hud[playerHpBar].size = { 640.0f,80.0f };
+	hud[playerHpBar].texturePos = { 0.0f,0.0f};
+	hud[playerHpBar].texturePercent = { 1.0f,1.0f };
+
+
 
 	// 頂点バッファ生成
 	D3D11_BUFFER_DESC bd;
@@ -68,23 +86,19 @@ HRESULT InitResult(void)
 
 
 	// 変数の初期化
-	g_Use = TRUE;
-	g_w = TEXTURE_WIDTH;
-	g_h = TEXTURE_HEIGHT;
-	g_Pos = { g_w / 2, 50.0f, 0.0f };
-	g_TexNo = 0;
+	g_Use = true;
 
 	// BGM再生
 
 
-	g_Load = TRUE;
+	g_Load = true;
 	return S_OK;
 }
 
 //=============================================================================
 // 終了処理
 //=============================================================================
-void UninitResult(void)
+void UninitHud(void)
 {
 	if (g_Load == FALSE) return;
 
@@ -109,16 +123,19 @@ void UninitResult(void)
 //=============================================================================
 // 更新処理
 //=============================================================================
-void UpdateResult(void)
+void UpdateHud(void)
 {
-
-
+	PLAYER *player = GetPlayer();
+	float percentHp = player->hpCurrent / (float)player->hpMax;
+	hud[playerHpBar].texturePercent.x = percentHp;
+	hud[playerHpBar].size.x = 640.0f * percentHp;
+	hud[playerHpBar].pos.x = SCREEN_CENTER_X -  320.0f *(1- percentHp);
 }
 
 //=============================================================================
 // 描画処理
 //=============================================================================
-void DrawResult(void)
+void DrawHud(void)
 {
 	// 2Dの物を描画する処理
 	// Z比較なし
@@ -143,68 +160,19 @@ void DrawResult(void)
 	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	SetMaterial(material);
 
-	// リザルトの背景を描画
+	for (int i = 0; i < TEXTURE_MAX; i++)
 	{
 		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[0]);
+		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[i]);
 
 		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		SetSpriteLeftTop(g_VertexBuffer, 0.0f, 0.0f, g_w, g_h, 0.0f, 0.0f, 1.0f, 1.0f);
+		SetSpriteColor(g_VertexBuffer,hud[i].pos.x, hud[i].pos.y, hud[i].size.x, hud[i].size.y, 
+			hud[i].texturePos.x, hud[i].texturePos.y, hud[i].texturePercent.x, hud[i].texturePercent.x,
+			hudColor);
 
 		// ポリゴン描画
 		GetDeviceContext()->Draw(4, 0);
 	}
-
-	// リザルトのロゴを描画
-	{
-		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
-
-		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		SetSprite(g_VertexBuffer, g_Pos.x, g_Pos.y, TEXTURE_WIDTH_LOGO, TEXTURE_HEIGHT_LOGO, 0.0f, 0.0f, 1.0f, 1.0f);
-
-		// ポリゴン描画
-		GetDeviceContext()->Draw(4, 0);
-	}
-
-
-	// スコア表示
-	{
-		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[2]);
-
-		// 桁数分処理する
-		int number = GetScore();
-		for (int i = 0; i < SCORE_DIGIT; i++)
-		{
-			// 今回表示する桁の数字
-			float x = (float)(number % 10);
-
-			// スコアの位置やテクスチャー座標を反映
-			float pw = 16 * 4;			// スコアの表示幅
-			float ph = 32 * 4;			// スコアの表示高さ
-			float px = 600.0f - i * pw;	// スコアの表示位置X
-			float py = 300.0f;			// スコアの表示位置Y
-
-			float tw = 1.0f / 10;		// テクスチャの幅
-			float th = 1.0f / 1;		// テクスチャの高さ
-			float tx = x * tw;			// テクスチャの左上X座標
-			float ty = 0.0f;			// テクスチャの左上Y座標
-
-			// １枚のポリゴンの頂点とテクスチャ座標を設定
-			SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
-				XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
-
-			// ポリゴン描画
-			GetDeviceContext()->Draw(4, 0);
-
-			// 次の桁へ
-			number /= 10;
-		}
-
-	}
-
-
 
 	// ライティングを有効に
 	SetLightEnable(true);
