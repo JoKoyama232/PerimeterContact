@@ -6,12 +6,10 @@
 //=============================================================================
 #pragma once
 
-
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define	MAX_BULLET		(256)	// 弾最大数
-
 #define	BULLET_WH		(5.0f)	// 当たり判定の大きさ
 
 //*****************************************************************************
@@ -19,27 +17,27 @@
 //*****************************************************************************
 typedef struct
 {
-	XMFLOAT3			pos;		// ポリゴンの位置
-	XMFLOAT3			rot;		// ポリゴンの向き(回転)
-	XMFLOAT3			scl;		// ポリゴンの大きさ(スケール)
+	// 3Dモデル変数群
+	DX11_MODEL	model;		// モデル情報
+	VERTEX_DATA	points;		// モデルの頂点情報
+	bool		load;		// モデルの読み込みフラグ
 
-	XMFLOAT4X4			mtxWorld;	// ワールドマトリックス
+	// ゲーム内位置変数群
+	XMFLOAT4X4	mtxWorld;	// ワールドマトリックス
+	XMFLOAT3	pos;		// ポリゴンの位置
+	XMFLOAT3	rot;		// ポリゴンの向き(回転)
+	XMFLOAT3	scl;		// ポリゴンの大きさ(スケール)
 
-	bool				load;
-	DX11_MODEL			model;		// モデル情報
-	VERTEX_DATA			points;
-
-
-	XMFLOAT3	*target;
-	XMFLOAT3	targetPos;			// スケール
-	XMFLOAT3	startPos;
-	XMFLOAT3	middlePos;
+	// ゲームロジック変数群
+	XMFLOAT3	startPos;	// ベジェ曲線の始点
+	XMFLOAT3	*target;	// ベジェ曲線の終点（追尾の為）
+	XMFLOAT3	targetPos;	// ベジェ曲線の終点（追尾が切れた時）		
+	XMFLOAT3	middlePos;	// ベジェ曲線の中間点
 	
-
-	DWORD		timer;
-	float		speed;
-	float		progress;
-	bool		use;			// 使用しているかどうか
+	DWORD		timer;		// 使用開始時からの時間（ms）
+	float		speed;		// バレットの一秒間の速度
+	float		progress;	// バレットの軌道上の位置
+	bool		use;		// 使用しているかどうか
 
 } BULLET;
 

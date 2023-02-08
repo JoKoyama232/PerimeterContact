@@ -100,7 +100,7 @@ void UpdateBullet(void)
 			directionVector =XMVector3Normalize( curPos - prevPos);
 
 			if(g_Bullet[i].progress > 0.5f)g_Bullet[i].pos.y +=  25.0f*sinf(g_Bullet[i].progress * 8 *XM_PI);
-			g_Bullet[i].progress +=  0.001f;
+			g_Bullet[i].progress +=  deltaTimeMs * g_Bullet[i].speed * 0.001;
 
 			if (g_Bullet[i].progress > 1.0f) 
 			{ 
