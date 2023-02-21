@@ -259,7 +259,8 @@ void UpdatePlayer(void)
 			//dashTbl[0] = g_Player.pos;
 			//dashTbl[1] = XMFLOAT3(g_Player.pos.x - sinf(g_Player.rot.y) * VALUE_MOVE * 60,
 			//	g_Player.pos.y, g_Player.pos.z - cosf(g_Player.rot.y) * VALUE_MOVE * 60);
-			SetBullet(g_Player.pos, &enemy[0].pos, 0.1f);
+			//SetBullet(g_Player.pos, &enemy[0].pos, 0.1f);
+			g_Player.hpCurrent--;
 		}
 
 		if (GetKeyboardTrigger(DIK_Q))

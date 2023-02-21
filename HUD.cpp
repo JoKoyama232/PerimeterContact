@@ -16,14 +16,14 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_MAX					(2)				// テクスチャの数
+#define TEXTURE_MAX					(4)				// テクスチャの数
 
 
 enum {
 	playerHpFrame = 0,
 	playerHpBar,
-	enemyHpBar,
 	enemyHpFrame,
+	enemyHpBar,
 };
 
 //*****************************************************************************
@@ -33,12 +33,15 @@ static ID3D11Buffer* g_VertexBuffer = NULL;		// 頂点情報
 static ID3D11ShaderResourceView* g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
 static char* g_TexturName[TEXTURE_MAX] = {
+	"data/TEXTURE/HPFrame.png",
 	"data/TEXTURE/HPBar.png",
 	"data/TEXTURE/HPFrame.png",
+	"data/TEXTURE/HPBar.png",
 };
 
 HUD	hud[TEXTURE_MAX];
-static XMFLOAT4 hudColor;
+static XMFLOAT4 hudColorPlayer;
+static XMFLOAT4 hudColorEnemy;
 static bool		g_Use = true;
 static bool		g_Load = false;
 
@@ -61,7 +64,8 @@ HRESULT InitHud(void)
 			NULL);
 	}
 
-	hudColor = { 1.0f,1.0f,1.0f,0.75f };
+	hudColorPlayer = { 1.0f,1.0f,1.0f,0.75f };
+	hudColorEnemy = { 1.0f,0.0f,0.0f,0.75f };
 
 	hud[playerHpFrame].pos = { SCREEN_WIDTH / 2,50.0f };
 	hud[playerHpFrame].size = { 640.0f,80.0f };
@@ -72,6 +76,16 @@ HRESULT InitHud(void)
 	hud[playerHpBar].size = { 640.0f,80.0f };
 	hud[playerHpBar].texturePos = { 0.0f,0.0f};
 	hud[playerHpBar].texturePercent = { 1.0f,1.0f };
+
+	hud[enemyHpFrame].pos = { SCREEN_WIDTH / 2,400.0f };
+	hud[enemyHpFrame].size = { 640.0f,80.0f };
+	hud[enemyHpFrame].texturePos = { 0.0f,0.0f };
+	hud[enemyHpFrame].texturePercent = { 1.0f,1.0f };
+		
+	hud[enemyHpBar].pos = { SCREEN_WIDTH / 2,400.0f };
+	hud[enemyHpBar].size = { 640.0f,80.0f };
+	hud[enemyHpBar].texturePos = { 0.0f,0.0f };
+	hud[enemyHpBar].texturePercent = { 1.0f,1.0f };
 
 
 
@@ -166,9 +180,16 @@ void DrawHud(void)
 		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[i]);
 
 		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		SetSpriteColor(g_VertexBuffer,hud[i].pos.x, hud[i].pos.y, hud[i].size.x, hud[i].size.y, 
-			hud[i].texturePos.x, hud[i].texturePos.y, hud[i].texturePercent.x, hud[i].texturePercent.x,
-			hudColor);
+		if (i < 1) {
+			SetSpriteColor(g_VertexBuffer, hud[i].pos.x, hud[i].pos.y, hud[i].size.x, hud[i].size.y,
+				hud[i].texturePos.x, hud[i].texturePos.y, hud[i].texturePercent.x, hud[i].texturePercent.y,
+				hudColorEnemy);
+		}
+		else {
+			SetSpriteColor(g_VertexBuffer, hud[i].pos.x, hud[i].pos.y, hud[i].size.x, hud[i].size.y,
+				hud[i].texturePos.x, hud[i].texturePos.y, hud[i].texturePercent.x, hud[i].texturePercent.y,
+				hudColorPlayer);
+		}
 
 		// ポリゴン描画
 		GetDeviceContext()->Draw(4, 0);

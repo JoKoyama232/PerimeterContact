@@ -48,6 +48,8 @@ HRESULT InitBullet(void)
 	for (int nCntBullet = 0; nCntBullet < MAX_BULLET; nCntBullet++)
 	{
 		LoadModel(MODEL_BULLET, &g_Bullet[nCntBullet].model, true, &g_Bullet[nCntBullet].points);
+		g_Bullet[nCntBullet].load = true;
+
 		g_Bullet[nCntBullet].pos = { 0.0f, 0.0f, 0.0f };
 		g_Bullet[nCntBullet].rot = { 0.0f, 0.0f, 0.0f };
 		g_Bullet[nCntBullet].targetPos = { 1.0f, 1.0f, 1.0f };
@@ -100,17 +102,18 @@ void UpdateBullet(void)
 			directionVector =XMVector3Normalize( curPos - prevPos);
 
 			if(g_Bullet[i].progress > 0.5f)g_Bullet[i].pos.y +=  25.0f*sinf(g_Bullet[i].progress * 8 *XM_PI);
-			g_Bullet[i].progress +=  deltaTimeMs * g_Bullet[i].speed * 0.001;
+			g_Bullet[i].progress +=  (float)deltaTimeMs * g_Bullet[i].speed * 0.001;
 
-			if (g_Bullet[i].progress > 1.0f) 
-			{ 
-				g_Bullet[i].use = false; 
-			}
-			// 影の位置設定
+			XMFLOAT3 direction ;
+			XMVECTOR pos1 = XMLoadFloat3(&g_Bullet[i].pos);
+			XMVECTOR pos2 = XMLoadFloat3(&GetBezier(g_Bullet[i].startPos, g_Bullet[i].middlePos, g_Bullet[i].targetPos, g_Bullet[i].progress));
+			
+			//g_Bullet[i].rot.x =
 
 
 			// フィールドの外に出たら弾を消す処理
-			if (g_Bullet[i].pos.x < MAP_LEFT
+			if (g_Bullet[i].progress > 1.0f
+				||g_Bullet[i].pos.x < MAP_LEFT
 				|| g_Bullet[i].pos.x > MAP_RIGHT
 				|| g_Bullet[i].pos.z < MAP_DOWN
 				|| g_Bullet[i].pos.z > MAP_TOP)
